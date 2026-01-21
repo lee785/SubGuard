@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-import { initializeUserWallet } from '@/lib/circle/circle_wallet';
-import { createCardholder, createVirtualCard } from '@/lib/stripe/stripe_issuing';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://subguard-api.fly.dev';
 
 /**
  * POST /api/onboard
  * Body: { userId: string, email: string, name: string }
+ * 
+ * This route proxies to the fly.io backend which handles Circle SDK operations.
  */
 export async function POST(req: Request) {
     try {
@@ -12,24 +14,32 @@ export async function POST(req: Request) {
 
         console.log(`🚀 Onboarding user: ${email} (${userId})`);
 
-        // 1. Create Circle Managed Wallet on Arc
-        const wallet = await initializeUserWallet(userId);
-        console.log(`✅ Circle Wallet created: ${wallet.id}`);
+        // Call the fly.io backend to create Circle wallet
+        const walletResponse = await fetch(`${API_URL}/api/wallet`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId })
+        });
 
-        // 2. Create Stripe Cardholder
-        const cardholder = await createCardholder(name, email);
-        console.log(`✅ Stripe Cardholder created: ${cardholder.id}`);
+        const walletData = await walletResponse.json();
 
-        // 3. Create Virtual Card
-        const card = await createVirtualCard(cardholder.id);
-        console.log(`✅ Virtual Card created: ${card.id}`);
+        if (!walletResponse.ok || !walletData.success) {
+            console.error('❌ Wallet creation failed:', walletData.error);
+            return NextResponse.json({
+                success: false,
+                error: walletData.error || 'Wallet creation failed'
+            }, { status: 500 });
+        }
 
+        console.log(`✅ Circle Wallet created: ${walletData.walletId} (${walletData.address})`);
+
+        // Return wallet details - Stripe card creation is optional/mock
         return NextResponse.json({
             success: true,
-            walletAddress: wallet.address,
-            walletId: wallet.id,
-            cardId: card.id,
-            cardLast4: card.last4,
+            walletAddress: walletData.address,
+            walletId: walletData.walletId,
+            cardId: `card_mock_${Date.now()}`,
+            cardLast4: '4242',
         });
 
     } catch (error: any) {

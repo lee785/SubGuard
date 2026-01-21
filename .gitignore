@@ -54,6 +54,7 @@ subguard-api/
 # Mintlify docs (separate repo)
 docs/
 mintlify/
+mint.json
 
 # IDE
 .idea/

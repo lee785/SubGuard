@@ -1,51 +1,44 @@
 import { NextResponse } from 'next/server';
-import { getWalletBalance } from '@/lib/circle/circle_wallet';
-import { getWalletByUserId } from '@/lib/db/user_wallets';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://subguard-api.fly.dev';
 
 /**
  * GET /api/wallet/balance?userId=xxx
- * Returns the USDC balance for a user's wallet
+ * Proxies to fly.io backend to get real USDC balance from Arc Testnet
  */
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get('userId');
-        const walletId = searchParams.get('walletId');
 
-        if (!userId && !walletId) {
+        if (!userId) {
             return NextResponse.json(
-                { success: false, error: 'userId or walletId is required' },
+                { success: false, error: 'userId is required' },
                 { status: 400 }
             );
         }
 
-        let targetWalletId = walletId;
+        // Call the fly.io backend
+        const response = await fetch(`${API_URL}/api/wallet/balance?userId=${userId}`);
+        const data = await response.json();
 
-        // If userId provided, lookup the wallet
-        if (userId && !walletId) {
-            const wallet = getWalletByUserId(userId);
-            if (!wallet) {
-                return NextResponse.json(
-                    { success: false, error: 'No wallet found for this user' },
-                    { status: 404 }
-                );
-            }
-            targetWalletId = wallet.walletId;
+        if (!response.ok) {
+            return NextResponse.json(
+                { success: false, error: data.error || 'Balance fetch failed' },
+                { status: response.status }
+            );
         }
-
-        const balance = await getWalletBalance(targetWalletId!);
 
         return NextResponse.json({
             success: true,
-            balance: balance.balance,
-            currency: balance.currency,
-            isMock: balance.isMock || false
+            balance: data.balance || '0',
+            currency: 'USDC'
         });
 
     } catch (error: any) {
         console.error('[API] Balance fetch failed:', error);
         return NextResponse.json(
-            { success: false, error: error.message },
+            { success: false, error: error.message, balance: '0' },
             { status: 500 }
         );
     }

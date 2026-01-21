@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { transferUSDC } from '@/lib/circle/circle_wallet';
-import { getWalletByUserId } from '@/lib/db/user_wallets';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://subguard-api.fly.dev';
 
 /**
  * POST /api/wallet/send
  * Body: { userId, toAddress, amount }
- * Sends USDC from user's wallet to another address
+ * Proxies to fly.io backend to send USDC on Arc Testnet
  */
 export async function POST(req: Request) {
     try {
@@ -18,25 +18,28 @@ export async function POST(req: Request) {
             );
         }
 
-        // Get user's wallet
-        const wallet = getWalletByUserId(userId);
-        if (!wallet) {
+        console.log(`[API] Sending ${amount} USDC to ${toAddress} for user ${userId}`);
+
+        // Call the fly.io backend
+        const response = await fetch(`${API_URL}/api/wallet/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, toAddress, amount })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
             return NextResponse.json(
-                { success: false, error: 'No wallet found for this user' },
-                { status: 404 }
+                { success: false, error: data.error || 'Transfer failed' },
+                { status: response.status }
             );
         }
 
-        console.log(`[API] Sending ${amount} USDC from ${wallet.address} to ${toAddress}`);
-
-        // Execute transfer
-        const result = await transferUSDC(wallet.walletId, toAddress, amount);
-
         return NextResponse.json({
-            success: result.success,
-            transactionId: result.transactionId,
-            status: result.status,
-            isMock: result.isMock || false
+            success: true,
+            transactionId: data.transactionId,
+            status: data.status
         });
 
     } catch (error: any) {

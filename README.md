@@ -1,4 +1,4 @@
-# SubGuard 🛡️
+# SubGuard 
 
 **AI-Powered Subscription Protection on Arc Testnet**
 
@@ -12,12 +12,12 @@ SubGuard is a next-generation dApp that protects users from subscription fraud a
 
 ## ✨ Features
 
-- **🔐 Circle Programmable Wallets**-Secure USDC wallets on Arc Testnet
-- **💳 Burner Virtual Cards** - Per-merchant disposable cards with spend limits
-- **🤖 AI Guard Agent** - Google Gemini-powered fraud detection
-- **⚡ Just-In-Time Liquidity** - Cards funded only when transactions occur
-- **📊 Real-Time Dashboard** - Monitor subscriptions and spending
-- **🎚️ Shield Configuration** - Per-subscription spend caps and sensitivity settings
+- ** Circle Programmable Wallets**-Secure USDC wallets on Arc Testnet
+- ** Burner Virtual Cards** - Per-merchant disposable cards with spend limits
+- ** AI Guard Agent** - Google Gemini-powered fraud detection
+- ** Just-In-Time Liquidity** - Cards funded only when transactions occur
+- ** Real-Time Dashboard** - Monitor subscriptions and spending
+- ** Shield Configuration** - Per-subscription spend caps and sensitivity settings
 
 ---
 

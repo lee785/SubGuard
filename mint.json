@@ -1,0 +1,85 @@
+{
+    "$schema": "https://mintlify.com/schema.json",
+    "name": "SubGuard",
+    "logo": {
+        "dark": "/logo/dark.png",
+        "light": "/logo/light.png"
+    },
+    "favicon": "/favicon.svg",
+    "colors": {
+        "primary": "#22c55e",
+        "light": "#4ade80",
+        "dark": "#16a34a",
+        "anchors": {
+            "from": "#22c55e",
+            "to": "#16a34a"
+        }
+    },
+    "topbarLinks": [
+        {
+            "name": "Dashboard",
+            "url": "https://subguard.io"
+        }
+    ],
+    "topbarCtaButton": {
+        "name": "Launch App",
+        "url": "https://subguard.io"
+    },
+    "tabs": [
+        {
+            "name": "Documentation",
+            "url": "docs"
+        }
+    ],
+    "anchors": [
+        {
+            "name": "GitHub",
+            "icon": "github",
+            "url": "https://github.com/yourusername/subguard"
+        },
+        {
+            "name": "Community",
+            "icon": "discord",
+            "url": "https://discord.gg/subguard"
+        }
+    ],
+    "navigation": [
+        {
+            "group": "Getting Started",
+            "pages": [
+                "docs/introduction",
+                "docs/quickstart"
+            ]
+        },
+        {
+            "group": "Core Concepts",
+            "pages": [
+                "docs/ai-agent",
+                "docs/protection-statuses",
+                "docs/wallet-generation"
+            ]
+        },
+        {
+            "group": "Dashboard",
+            "pages": [
+                "docs/dashboard-overview",
+                "docs/subscriptions",
+                "docs/virtual-cards",
+                "docs/transactions",
+                "docs/settings"
+            ]
+        },
+        {
+            "group": "Technology",
+            "pages": [
+                "docs/arc-l1-circle",
+                "docs/demo-limitations"
+            ]
+        }
+    ],
+    "footerSocials": {
+        "github": "https://github.com/yourusername/subguard",
+        "discord": "https://discord.gg/subguard"
+    },
+    "backgroundImage": "/images/background.png"
+}

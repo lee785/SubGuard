@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #030305;
+  --foreground: #ffffff;
+  --primary: #22c55e;
+  /* Emerald Green from Reference */
+  --primary-hover: #16a34a;
+  --secondary: #10b981;
+  --accent: #4ade80;
+  --glass-bg: rgba(255, 255, 255, 0.02);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-hover: rgba(255, 255, 255, 0.04);
+}
+
+@layer base {
+
+  html,
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply relative overflow-hidden transition-all duration-300 ease-in-out;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+  }
+
+  .glass-card:hover {
+    @apply -translate-y-1;
+    background: var(--glass-hover);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .btn-primary {
+    @apply relative flex items-center justify-center font-bold px-8 py-3.5 rounded-xl transition-all duration-200 overflow-hidden;
+    background: var(--primary);
+    color: #000;
+    /* Black text on green for contrast as per reference */
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+  }
+
+  .btn-primary:hover {
+    @apply -translate-y-0.5;
+    background: var(--primary-hover);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+  }
+
+  .btn-secondary {
+    @apply relative flex items-center justify-center font-bold px-8 py-3.5 rounded-xl transition-all duration-200 border border-white/20;
+    background: transparent;
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    @apply bg-white/5 border-white/40;
+  }
+
+  .text-glow-green {
+    text-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+  }
+
+  .section-container {
+    @apply max-w-7xl mx-auto px-6 py-20 md:py-32;
+  }
+
+  .partner-ticker-animation {
+    animation: ticker 40s linear infinite;
+  }
+
+  .animate-flow-line {
+    stroke-dasharray: 10;
+    animation: flow-line 20s linear infinite;
+  }
+
+  .glow-band {
+    animation: glow-pulse 4s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes float-delayed {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 8s ease-in-out infinite 1s;
+}
+
+@keyframes flow-line {
+  from {
+    stroke-dashoffset: 200;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes glow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    filter: brightness(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    filter: brightness(1.5);
+  }
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.bg-mesh {
+  @apply fixed inset-0 pointer-events-none;
+  z-index: -1;
+  background-color: var(--background);
+  background-image:
+    radial-gradient(at 10% 10%, rgba(34, 197, 94, 0.05) 0px, transparent 40%),
+    radial-gradient(at 90% 90%, rgba(16, 185, 129, 0.05) 0px, transparent 40%);
+  filter: blur(100px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(34, 197, 94, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 197, 94, 0.4);
+}

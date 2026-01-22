@@ -84,8 +84,8 @@ export default function VirtualShieldFlow({ onComplete, onCancel, slotIndex, tot
                 {/* Left Side: Configuration */}
                 <div className="flex-grow p-12 overflow-y-auto space-y-12 border-r border-white/5">
                     <div className="space-y-2">
-                        <h2 className="text-4xl font-bold tracking-tight text-white">Create Virtual Shield</h2>
-                        <p className="text-foreground/40 text-sm">Configure a secure, isolated payment method for your subscription services.</p>
+                        <h2 className="text-3xl font-bold tracking-tight text-white">Create Virtual Shield</h2>
+                        <p className="text-foreground/40 text-xs">Configure a secure, isolated payment method for your subscription services.</p>
                     </div>
 
                     {/* Step 1: Merchant */}
@@ -179,7 +179,7 @@ export default function VirtualShieldFlow({ onComplete, onCancel, slotIndex, tot
                                 <div className="flex items-baseline justify-between">
                                     <span className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Limit Amount</span>
                                     <div className="flex items-baseline gap-2">
-                                        <span className="text-3xl font-bold text-white">{limit}.00</span>
+                                        <span className="text-2xl font-bold text-white">{limit}.00</span>
                                         <span className="text-xs font-black text-primary uppercase">USDC</span>
                                     </div>
                                 </div>

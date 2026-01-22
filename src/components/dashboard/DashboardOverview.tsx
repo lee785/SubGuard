@@ -93,8 +93,8 @@ export default function DashboardOverview({
                         </div>
                         <div className="space-y-2">
                             <div className="flex items-baseline gap-2 sm:gap-4">
-                                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-white">${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-primary/60 tracking-tight">USDC</p>
+                                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-medium tracking-tight text-white">${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                <p className="text-base sm:text-lg lg:text-xl font-bold text-primary/60 tracking-tight">USDC</p>
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="flex items-center gap-1 text-primary text-xs font-bold">

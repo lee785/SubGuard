@@ -454,7 +454,7 @@ export default function Home() {
         <div className="min-h-screen flex flex-col pt-0 bg-[#030305]">
             {/* Navigation */}
             <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#030305]/80 backdrop-blur-md">
-                <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+                <div className="max-w-[1240px] mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <img src="/icons/SubGuard.png" alt="SubGuard" className="w-10 h-10 object-contain" />
                         <span className="font-bold text-xl tracking-tighter">SUBGUARD</span>
@@ -476,14 +476,14 @@ export default function Home() {
             </nav>
 
             {/* Hero Section */}
-            <section className="pt-40 pb-20 px-6">
-                <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <section className="pt-32 pb-16 px-6">
+                <div className="max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div className="space-y-8 animate-in fade-in slide-in-from-left duration-1000 md:-ml-12">
                         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 w-fit">
                             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                             <span className="text-[10px] font-bold text-primary uppercase tracking-widest">LIVE ON ARC TESTNET</span>
                         </div>
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[0.95]">
+                        <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-[0.95]">
                             <span className="text-white">Your USDC Treasury,</span> <br />
                             <span className="text-primary italic">Autonomously Guarded.</span>
                         </h1>
@@ -520,7 +520,7 @@ export default function Home() {
                         {/* Floating Cards Composition */}
                         <div className="relative w-full h-full">
                             {/* Netflix Card */}
-                            <div className="absolute top-[35%] left-[0%] z-20 animate-float shadow-2xl scale-110">
+                            <div className="absolute top-[35%] left-[0%] z-20 animate-float shadow-2xl">
                                 <div className="glass-card bg-[#0a0a0c]/90 border-white/10 p-5 w-72">
                                     <div className="flex items-center gap-4">
                                         <div className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 overflow-hidden shrink-0">
@@ -544,7 +544,7 @@ export default function Home() {
                             </div>
 
                             {/* Disney+ Card */}
-                            <div className="absolute top-[10%] right-[5%] z-10 animate-float-delayed shadow-2xl scale-110">
+                            <div className="absolute top-[10%] right-[5%] z-10 animate-float-delayed shadow-2xl opacity-60">
                                 <div className="glass-card bg-[#0a0a0c]/80 border-white/5 p-4 w-56 space-y-3 opacity-60">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center border border-white/5 overflow-hidden">
@@ -723,8 +723,8 @@ export default function Home() {
 
             {/* CTA Banner */}
             <section className="px-6 py-20">
-                <div className="max-w-7xl mx-auto rounded-[40px] bg-primary p-20 text-center space-y-8 shadow-[0_20px_50px_rgba(34,197,94,0.2)]">
-                    <h2 className="text-5xl md:text-7xl font-bold text-black leading-tight tracking-tight">Secure Your Operations.</h2>
+                <div className="max-w-[1240px] mx-auto rounded-[40px] bg-primary p-20 text-center space-y-8 shadow-[0_20px_50px_rgba(34,197,94,0.2)]">
+                    <h2 className="text-4xl md:text-6xl font-bold text-black leading-tight tracking-tight">Secure Your Operations.</h2>
                     <p className="text-black/70 max-w-xl mx-auto font-medium text-lg">The standard for DAO treasury management and high-net-worth individual security on the Arc Network.</p>
                     <div className="flex flex-wrap justify-center gap-6 pt-10">
                         <button onClick={login} className="bg-black text-white px-12 py-5 uppercase font-black text-xs tracking-[0.2em] rounded-xl hover:scale-105 transition-all shadow-2xl">Get Started Now</button>

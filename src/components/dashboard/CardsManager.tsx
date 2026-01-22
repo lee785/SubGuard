@@ -114,26 +114,26 @@ export default function CardsManager({
                     <div className="w-12 lg:w-12 h-12 lg:h-12 rounded-xl lg:rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
                         <Library className="w-5 lg:w-6 h-5 lg:h-6 text-primary" />
                     </div>
-                    <div className="space-y-0.5 lg:space-y-1 flex-grow-0 lg:flex-grow text-center lg:text-left">
-                        <p className="text-[9px] lg:text-[10px] font-black tracking-[0.2em] lg:tracking-[0.3em] text-foreground/20 uppercase">Current Subscription</p>
+                    <div className="space-y-0.5 flex-grow-0 lg:flex-grow text-center lg:text-left">
+                        <p className="text-[9px] font-black tracking-[0.2em] text-foreground/20 uppercase">Current Subscription</p>
                         <div className="flex items-center justify-center lg:justify-start gap-2">
-                            <h3 className="text-lg lg:text-lg font-bold text-white">{currentTier.name}</h3>
-                            <span className="text-[8px] lg:text-[9px] font-black px-1.5 lg:px-2 py-0.5 rounded bg-primary text-black uppercase tracking-widest">Active</span>
+                            <h3 className="text-base font-bold text-white">{currentTier.name}</h3>
+                            <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-primary text-black uppercase tracking-widest">Active</span>
                         </div>
                     </div>
                 </div>
 
                 <div className="flex items-center justify-between w-full gap-6 py-3 lg:py-0 border-y lg:border-0 border-white/5">
-                    <div className="space-y-0.5 lg:space-y-1 text-center flex-1">
-                        <p className="text-[9px] lg:text-[10px] font-black tracking-[0.15em] lg:tracking-[0.2em] text-foreground/20 uppercase">Card Usage</p>
-                        <p className="text-lg lg:text-lg font-bold text-white">
+                    <div className="space-y-0.5 text-center flex-1">
+                        <p className="text-[9px] font-black tracking-[0.15em] text-foreground/20 uppercase">Card Usage</p>
+                        <p className="text-base font-bold text-white">
                             {userCards.length} <span className="text-foreground/20">/</span> {currentTier.maxCards}
                         </p>
                     </div>
                     <div className="w-px h-8 bg-white/10" />
-                    <div className="space-y-0.5 lg:space-y-1 text-center flex-1">
-                        <p className="text-[9px] lg:text-[10px] font-black tracking-[0.15em] lg:tracking-[0.2em] text-foreground/20 uppercase">Limit Remaining</p>
-                        <p className="text-lg lg:text-lg font-bold text-primary">$320.00</p>
+                    <div className="space-y-0.5 text-center flex-1">
+                        <p className="text-[9px] font-black tracking-[0.15em] text-foreground/20 uppercase">Limit Remaining</p>
+                        <p className="text-base font-bold text-primary">$320.00</p>
                     </div>
                 </div>
 
@@ -149,8 +149,8 @@ export default function CardsManager({
             {/* Content Header */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-xl lg:text-xl font-bold tracking-tight text-white">Virtual Shields</h2>
-                    <p className="text-xs lg:text-sm text-foreground/40 font-medium">Isolated, non-custodial payment methods for your treasury.</p>
+                    <h2 className="text-lg font-bold tracking-tight text-white">Virtual Shields</h2>
+                    <p className="text-xs text-foreground/40 font-medium">Isolated, non-custodial payment methods for your treasury.</p>
                 </div>
                 <button
                     onClick={handleGenerateClick}
@@ -183,8 +183,8 @@ export default function CardsManager({
                                     <img src={card.merchant?.icon || card.logo} alt={card.merchant?.name || card.name} className="w-5 lg:w-7 h-5 lg:h-7 object-contain opacity-80 group-hover:opacity-100 transition-opacity" />
                                 </div>
                                 <div className="space-y-0.5">
-                                    <h3 className="text-sm lg:text-lg font-bold text-white/90">{card.merchant?.name || card.name}</h3>
-                                    <p className="text-[10px] lg:text-[11px] font-mono tracking-[0.2em] text-foreground/30">•••• {card.last3 || card.last4?.slice(-3)}</p>
+                                    <h3 className="text-sm lg:text-base font-bold text-white/90">{card.merchant?.name || card.name}</h3>
+                                    <p className="text-[10px] font-mono tracking-[0.2em] text-foreground/30">•••• {card.last3 || card.last4?.slice(-3)}</p>
                                 </div>
                             </div>
                             <div className={cn(

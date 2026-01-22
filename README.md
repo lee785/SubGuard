@@ -1,4 +1,4 @@
-# SubGuard 🛡️
+# SubGuard 
 
 **AI-Powered Subscription Protection on Arc Testnet**
 
@@ -12,12 +12,12 @@ SubGuard is a next-generation dApp that protects users from subscription fraud a
 
 ## ✨ Features
 
-- **🔐 Circle Programmable Wallets** — Secure USDC wallets on Arc Testnet
-- **💳 Burner Virtual Cards** — Per-merchant disposable cards with spend limits
-- **🤖 AI Guard Agent** — Google Gemini-powered fraud detection
-- **⚡ Just-In-Time Liquidity** — Cards funded only when transactions occur
-- **📊 Real-Time Dashboard** — Monitor subscriptions and spending
-- **🎚️ Shield Configuration** — Per-subscription spend caps and sensitivity settings
+- Circle Programmable Wallets - Secure USDC wallets on Arc Testnet
+- Burner Virtual Cards - Per-merchant disposable cards with spend limits
+- AI Guard Agent - Google Gemini-powered fraud detection
+- Just-In-Time Liquidity - Cards funded only when transactions occur
+- Real-Time Dashboard - Monitor subscriptions and spending
+- Shield Configuration - Per-subscription spend caps and sensitivity settings
 
 ---
 
@@ -67,27 +67,6 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 
 ---
 
-## 🔧 Environment Variables
-
-Create a `.env.local` file with:
-
-```env
-# Circle API
-CIRCLE_API_KEY=your_circle_api_key
-CIRCLE_ENTITY_SECRET=your_entity_secret
-CIRCLE_WALLET_SET_ID=your_wallet_set_id
-
-# Privy Authentication
-NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
-
-# Google Gemini (AI Agent)
-GEMINI_API_KEY=your_gemini_api_key
-
-# Backend API
-NEXT_PUBLIC_API_URL=https://your-backend.fly.dev
-```
-
----
 
 ## 📁 Project Structure
 
@@ -124,8 +103,6 @@ SubGuard/
 - **Authentication:** Privy
 - **Blockchain:** Circle Programmable Wallets (Arc Testnet)
 - **AI Agent:** Google Gemini
-- **Backend:** Express.js (deployed on fly.io)
-- **Database:** SQLite (sql.js)
 
 ---
 
@@ -137,11 +114,6 @@ SubGuard/
 vercel --prod
 ```
 
-### Backend (fly.io)
-```bash
-cd subguard-api
-flyctl deploy
-```
 
 ---
 
@@ -160,8 +132,6 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## 🔗 Links
 
 - **Live Demo:** [Coming Soon]
-- **Backend API:** https://subguard-api.fly.dev
-- **Circle Docs:** https://developers.circle.com
 
 ---
 

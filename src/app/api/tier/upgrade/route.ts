@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server';
 import { getWalletByUserId, updateUserTier, getUserTier } from '@/lib/db/user_wallets';
 import { getWalletBalance, transferUSDC } from '@/lib/circle/circle_wallet';
+import { authenticateRequest } from '@/lib/auth/privy-server';
+import { checkRateLimit } from '@/lib/ratelimit/simple-limiter';
+import { tierUpgradeSchema } from '@/lib/validation/schemas';
+import { z } from 'zod';
 
-const SUBGUARD_ADMIN_WALLET = process.env.SUBGUARD_ADMIN_WALLET || '0xCD4c2FCB8af53d5DCcC95eD0230985431E3D2289';
+// Admin wallet - validated at startup
+const SUBGUARD_ADMIN_WALLET = process.env.SUBGUARD_ADMIN_WALLET;
+
+if (!SUBGUARD_ADMIN_WALLET) {
+    throw new Error('SUBGUARD_ADMIN_WALLET environment variable is not configured');
+}
 
 // Tier pricing in USDC
 const TIER_PRICES: Record<string, number> = {
@@ -13,20 +22,34 @@ const TIER_PRICES: Record<string, number> = {
 
 /**
  * POST /api/tier/upgrade
- * Body: { userId, tierId }
+ * Body: { tierId }
  * 
- * Upgrades a user's tier after verifying balance and processing payment.
+ * Upgrades the authenticated user's tier after verifying balance and processing payment.
  */
 export async function POST(req: Request) {
     try {
-        const { userId, tierId } = await req.json();
-
-        if (!userId || !tierId) {
+        // Rate limiting
+        const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+        if (!checkRateLimit(`tier_${ip}`)) {
             return NextResponse.json(
-                { success: false, error: 'userId and tierId are required' },
-                { status: 400 }
+                { success: false, error: 'Too many requests. Please try again later.' },
+                { status: 429 }
             );
         }
+
+        // Authentication
+        const userId = await authenticateRequest(req);
+        if (!userId) {
+            return NextResponse.json(
+                { success: false, error: 'Unauthorized. Please sign in.' },
+                { status: 401 }
+            );
+        }
+
+        // Parse and validate input
+        const body = await req.json();
+        const validated = tierUpgradeSchema.parse(body);
+        const tierId = validated.tierId;
 
         const tierPrice = TIER_PRICES[tierId];
         if (tierPrice === undefined) {
@@ -40,7 +63,7 @@ export async function POST(req: Request) {
         const wallet = getWalletByUserId(userId);
         if (!wallet) {
             return NextResponse.json(
-                { success: false, error: 'No wallet found for this user. Please sign in again.' },
+                { success: false, error: 'No wallet found. Please sign in again.' },
                 { status: 404 }
             );
         }
@@ -64,18 +87,18 @@ export async function POST(req: Request) {
         if (userBalance < tierPrice) {
             return NextResponse.json({
                 success: false,
-                error: `Not enough balance. You need ${tierPrice} USDC but have ${userBalance.toFixed(2)} USDC. Deposit USDC to upgrade tier.`,
+                error: `Insufficient balance. You need ${tierPrice} USDC but have ${userBalance.toFixed(2)} USDC.`,
                 requiredBalance: tierPrice,
                 currentBalance: userBalance
             }, { status: 400 });
         }
 
         // Process payment to SubGuard admin wallet
-        console.log(`[Tier Upgrade] Transferring ${tierPrice} USDC to admin wallet ${SUBGUARD_ADMIN_WALLET}...`);
+        console.log(`[Tier Upgrade] Transferring ${tierPrice} USDC to admin wallet...`);
 
         const transferResult = await transferUSDC(
             wallet.walletId,
-            SUBGUARD_ADMIN_WALLET,
+            SUBGUARD_ADMIN_WALLET!,
             tierPrice.toString()
         );
 
@@ -99,27 +122,46 @@ export async function POST(req: Request) {
         });
 
     } catch (error: any) {
+        // Handle validation errors
+        if (error instanceof z.ZodError) {
+            return NextResponse.json(
+                { success: false, error: error.errors[0].message },
+                { status: 400 }
+            );
+        }
+
+        // Log full error server-side
         console.error('[Tier Upgrade] Error:', error);
+
+        // Return generic error message to client
         return NextResponse.json(
-            { success: false, error: error.message },
+            { success: false, error: 'Tier upgrade failed. Please try again.' },
             { status: 500 }
         );
     }
 }
 
 /**
- * GET /api/tier/upgrade?userId=xxx
- * Returns the user's current tier
+ * GET /api/tier/upgrade
+ * Returns the authenticated user's current tier
  */
 export async function GET(req: Request) {
     try {
-        const { searchParams } = new URL(req.url);
-        const userId = searchParams.get('userId');
+        // Rate limiting
+        const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+        if (!checkRateLimit(`tier_get_${ip}`)) {
+            return NextResponse.json(
+                { success: false, error: 'Too many requests. Please try again later.' },
+                { status: 429 }
+            );
+        }
 
+        // Authentication
+        const userId = await authenticateRequest(req);
         if (!userId) {
             return NextResponse.json(
-                { success: false, error: 'userId is required' },
-                { status: 400 }
+                { success: false, error: 'Unauthorized. Please sign in.' },
+                { status: 401 }
             );
         }
 
@@ -131,8 +173,12 @@ export async function GET(req: Request) {
         });
 
     } catch (error: any) {
+        // Log full error server-side
+        console.error('[Tier GET] Error:', error);
+
+        // Return generic error message to client
         return NextResponse.json(
-            { success: false, error: error.message },
+            { success: false, error: 'Failed to fetch tier. Please try again.' },
             { status: 500 }
         );
     }

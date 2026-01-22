@@ -11,10 +11,17 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             config={{
                 appearance: {
                     theme: 'dark',
-                    accentColor: '#00E0FF', // Arc Blue
+                    accentColor: '#00D1FF', // Arc Blue
                     showWalletLoginFirst: true,
                 },
                 loginMethods: ['email', 'google', 'wallet'],
+                embeddedWallets: {
+                    createOnLogin: 'off',
+                    noPromptOnSignature: true,
+                },
+            }}
+            onSuccess={() => {
+                console.log('✅ Privy login successful');
             }}
         >
             {children}

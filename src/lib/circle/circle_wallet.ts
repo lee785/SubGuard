@@ -4,7 +4,7 @@ import { getWalletByUserId, saveUserWallet } from '@/lib/db/user_wallets';
 // Initialize Circle SDK Client
 const circleClient = initiateDeveloperControlledWalletsClient({
     apiKey: process.env.CIRCLE_API_KEY!,
-    entitySecret: process.env.CIRCLE_ENTITY_SECRET!
+    entitySecret: process.env.CIRCLE_ENTITY_SECRET_HEX!
 });
 
 const WALLET_SET_ID = process.env.CIRCLE_WALLET_SET_ID!;
@@ -141,4 +141,49 @@ export async function transferUSDC(
  */
 export function getUserWallet(userId: string) {
     return getWalletByUserId(userId);
+}
+
+/**
+ * Fund a virtual card wallet from the SubGuard admin wallet.
+ * This is used for JIT funding of burner cards.
+ */
+export async function fundVirtualCard(targetWalletId: string, amount: string) {
+    const adminWalletId = process.env.CIRCLE_ADMIN_WALLET_ID;
+
+    if (!adminWalletId) {
+        throw new Error('CIRCLE_ADMIN_WALLET_ID environment variable is not configured');
+    }
+
+    console.log(`[Circle] JIT Funding: ${amount} USDC from admin to wallet ${targetWalletId}`);
+
+    try {
+        // 1. Get the target wallet's address
+        const walletResponse = await circleClient.getWallet({ id: targetWalletId });
+        const destinationAddress = walletResponse.data?.wallet?.address;
+
+        if (!destinationAddress) {
+            throw new Error(`Could not find address for wallet ${targetWalletId}`);
+        }
+
+        // 2. Transfer from admin to target address
+        const response = await circleClient.createTransaction({
+            walletId: adminWalletId,
+            tokenId: 'USDC',
+            destinationAddress: destinationAddress,
+            amount: [amount],
+            fee: {
+                type: 'level',
+                config: { feeLevel: 'MEDIUM' }
+            }
+        });
+
+        return {
+            success: true,
+            transactionId: response.data?.id,
+            status: response.data?.state
+        };
+    } catch (error: any) {
+        console.error(`[Circle] JIT Funding failed:`, error.message);
+        throw error;
+    }
 }

@@ -13,13 +13,15 @@
     "@circle-fin/developer-controlled-wallets": "^10.0.1",
     "@google/generative-ai": "^0.21.0",
     "@privy-io/react-auth": "^1.96.0",
+    "@privy-io/server-auth": "^1.32.5",
     "clsx": "^2.1.1",
     "lucide-react": "^0.471.0",
     "next": "15.1.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "stripe": "^17.7.0",
-    "tailwind-merge": "^2.6.0"
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.17.15",

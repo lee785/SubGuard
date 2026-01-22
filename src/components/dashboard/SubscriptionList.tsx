@@ -33,55 +33,101 @@ export default function SubscriptionList({ subs, toggleSub, onUnsubscribe }: Sub
         <div className="space-y-4">
             <div className="space-y-4">
                 {displayedSubs.map(sub => (
-                    <div key={sub.id} className="glass-card p-6 group flex items-center justify-between border-white/5 hover:border-primary/20 bg-white/[0.01]">
-                        <div className="flex items-center gap-6">
-                            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center overflow-hidden border border-white/5 group-hover:bg-white/10 transition-colors">
-                                {sub.icon.startsWith('/') ? (
-                                    <img src={sub.icon} alt={sub.name} className="w-8 h-8 object-contain" />
-                                ) : (
-                                    <span className="text-2xl">{sub.icon}</span>
-                                )}
-                            </div>
-                            <div>
-                                <h4 className="font-bold text-base">{sub.name}</h4>
-                                <p className="text-xs text-foreground/30 uppercase tracking-widest font-black mt-1 flex gap-4">
-                                    <span>{sub.type}</span>
-                                    <span className="text-primary">{sub.amount} USDC</span>
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex gap-2">
-                                <div className="relative group/tooltip">
-                                    <button
-                                        onClick={() => toggleSub(sub.id)}
-                                        className={`text-[10px] font-black px-4 py-2 rounded-lg uppercase tracking-[0.2em] transition-all ${sub.status === 'Active' ? "bg-primary text-black" :
-                                            sub.status === 'Guarded' ? "bg-white/10 text-white border border-white/10" :
-                                                "bg-red-500/20 text-red-500 border border-red-500/20"
-                                            }`}
-                                    >
-                                        {sub.status}
-                                    </button>
-                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-black text-[8px] text-white opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none uppercase tracking-widest font-black">
-                                        Agent Guarding Status
-                                    </div>
+                    <div key={sub.id} className="glass-card p-4 lg:p-6 group border-white/5 hover:border-primary/20 bg-white/[0.01]">
+                        {/* Mobile Layout */}
+                        <div className="lg:hidden space-y-4">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center overflow-hidden border border-white/5 shrink-0">
+                                    {sub.icon.startsWith('/') ? (
+                                        <img src={sub.icon} alt={sub.name} className="w-7 h-7 object-contain" />
+                                    ) : (
+                                        <span className="text-xl">{sub.icon}</span>
+                                    )}
+                                </div>
+                                <div className="flex-grow min-w-0">
+                                    <h4 className="font-bold text-sm truncate">{sub.name}</h4>
+                                    <p className="text-[10px] text-foreground/30 uppercase tracking-widest font-black mt-0.5">
+                                        <span>{sub.type}</span>
+                                        <span className="text-primary ml-2">{sub.amount} USDC</span>
+                                    </p>
                                 </div>
                                 <button
+                                    onClick={() => setSelectedSubForConfig(sub)}
+                                    className="p-2 rounded-lg bg-white/5 text-foreground/40 shrink-0"
+                                >
+                                    <Settings className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => toggleSub(sub.id)}
+                                    className={`flex-1 text-[9px] font-black px-3 py-2 rounded-lg uppercase tracking-widest transition-all ${sub.status === 'Active' ? "bg-primary text-black" :
+                                        sub.status === 'Guarded' ? "bg-white/10 text-white border border-white/10" :
+                                            "bg-red-500/20 text-red-500 border border-red-500/20"
+                                        }`}
+                                >
+                                    {sub.status}
+                                </button>
+                                <button
                                     onClick={() => onUnsubscribe(sub.id)}
-                                    className="text-[10px] font-black px-4 py-2 rounded-lg uppercase tracking-[0.2em] bg-red-500/10 text-red-500 border border-red-500/10 hover:bg-red-500/20 transition-all font-mono"
+                                    className="flex-1 text-[9px] font-black px-3 py-2 rounded-lg uppercase tracking-widest bg-red-500/10 text-red-500 border border-red-500/10"
                                 >
                                     UNSUBSCRIBE
                                 </button>
                             </div>
-                            <div className="relative group/tooltip">
-                                <button
-                                    onClick={() => setSelectedSubForConfig(sub)}
-                                    className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-foreground/40 transition-colors"
-                                >
-                                    <Settings className="w-4 h-4" />
-                                </button>
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-black text-[8px] text-white opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none uppercase tracking-widest font-black">
-                                    Configure Shield
+                        </div>
+
+                        {/* Desktop Layout */}
+                        <div className="hidden lg:flex items-center justify-between">
+                            <div className="flex items-center gap-6">
+                                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center overflow-hidden border border-white/5 group-hover:bg-white/10 transition-colors">
+                                    {sub.icon.startsWith('/') ? (
+                                        <img src={sub.icon} alt={sub.name} className="w-8 h-8 object-contain" />
+                                    ) : (
+                                        <span className="text-2xl">{sub.icon}</span>
+                                    )}
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-base">{sub.name}</h4>
+                                    <p className="text-xs text-foreground/30 uppercase tracking-widest font-black mt-1 flex gap-4">
+                                        <span>{sub.type}</span>
+                                        <span className="text-primary">{sub.amount} USDC</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="flex gap-2">
+                                    <div className="relative group/tooltip">
+                                        <button
+                                            onClick={() => toggleSub(sub.id)}
+                                            className={`text-[10px] font-black px-4 py-2 rounded-lg uppercase tracking-[0.2em] transition-all ${sub.status === 'Active' ? "bg-primary text-black" :
+                                                sub.status === 'Guarded' ? "bg-white/10 text-white border border-white/10" :
+                                                    "bg-red-500/20 text-red-500 border border-red-500/20"
+                                                }`}
+                                        >
+                                            {sub.status}
+                                        </button>
+                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-black text-[8px] text-white opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none uppercase tracking-widest font-black">
+                                            Agent Guarding Status
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => onUnsubscribe(sub.id)}
+                                        className="text-[10px] font-black px-4 py-2 rounded-lg uppercase tracking-[0.2em] bg-red-500/10 text-red-500 border border-red-500/10 hover:bg-red-500/20 transition-all font-mono"
+                                    >
+                                        UNSUBSCRIBE
+                                    </button>
+                                </div>
+                                <div className="relative group/tooltip">
+                                    <button
+                                        onClick={() => setSelectedSubForConfig(sub)}
+                                        className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-foreground/40 transition-colors"
+                                    >
+                                        <Settings className="w-4 h-4" />
+                                    </button>
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-black text-[8px] text-white opacity-0 group-hover/tooltip:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none uppercase tracking-widest font-black">
+                                        Configure Shield
+                                    </div>
                                 </div>
                             </div>
                         </div>

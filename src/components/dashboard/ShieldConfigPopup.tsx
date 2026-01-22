@@ -49,9 +49,9 @@ export default function ShieldConfigPopup({ sub, onClose, onSave }: ShieldConfig
                 onClick={onClose}
             />
 
-            <div className="relative w-full max-w-md glass-card bg-[#0a0a0c] border-white/10 shadow-3xl animate-in zoom-in-95 duration-300 overflow-hidden">
+            <div className="relative w-full h-[90vh] sm:h-auto sm:max-h-[85vh] sm:max-w-md glass-card bg-[#0a0a0c] border-white/10 shadow-3xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-300 overflow-hidden rounded-t-3xl sm:rounded-2xl">
                 {/* Header */}
-                <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                <div className="p-4 sm:p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 overflow-hidden">
                             <img src={sub.icon} alt={sub.name} className="w-8 h-8 object-contain" />

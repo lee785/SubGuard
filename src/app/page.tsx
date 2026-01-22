@@ -72,42 +72,14 @@ export default function Home() {
     const [currentTier, setCurrentTier] = useState<{ id: 'free' | 'tier1' | 'tier2', name: string, maxCards: number }>({ id: 'free', name: 'Tier 1', maxCards: 1 });
     const [userCards, setUserCards] = useState<any[]>([]);
     const [cardSuccess, setCardSuccess] = useState<any>(null);
-    const [cardToView, setCardToView] = useState<any>(null);
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'cards' | 'transactions' | 'subscriptions' | 'settings'>('dashboard');
     const [subs, setSubs] = useState(MOCK_SUBSCRIPTIONS);
     const [notifications, setNotifications] = useState<any[]>([]);
     const [isNotifOpen, setIsNotifOpen] = useState(false);
-    const [circleWallet, setCircleWallet] = useState<{ address: string; walletId: string } | null>(null);
-    const [userBalance, setUserBalance] = useState<number>(0);
-
-    // Fetch user balance when wallet is available
-    useEffect(() => {
-        const fetchBalance = async () => {
-            if (!user?.id) return;
-            try {
-                const res = await fetch(`/api/wallet/balance?userId=${user.id}`);
-                const data = await res.json();
-                if (data.success) {
-                    setUserBalance(parseFloat(data.balance) || 0);
-                }
-            } catch (e) {
-                console.error('Failed to fetch balance:', e);
-            }
-        };
-        fetchBalance();
-    }, [user?.id, circleWallet]);
-
-    // Load saved tier from localStorage
-    useEffect(() => {
-        if (user?.id) {
-            const savedTier = localStorage.getItem(`tier_${user.id}`);
-            if (savedTier === 'tier1') {
-                setCurrentTier({ id: 'tier1', name: 'Tier 2', maxCards: 2 });
-            } else if (savedTier === 'tier2') {
-                setCurrentTier({ id: 'tier2', name: 'Tier 3', maxCards: 4 });
-            }
-        }
-    }, [user?.id]);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [circleWallet, setCircleWallet] = useState<any>(null);
+    const [balance, setBalance] = useState<number>(0);
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'cards' | 'transactions' | 'subscriptions' | 'settings'>('dashboard');
+    const [cardToView, setCardToView] = useState<any>(null);
 
     // Persistence: Load active tab from localStorage
     useEffect(() => {
@@ -125,21 +97,41 @@ export default function Home() {
     // Trigger onboarding and wallet creation when user authenticates
     useEffect(() => {
         if (ready && authenticated && user) {
-            handleOnboard();
+            // Add a small delay so the onboarding fetch doesn't compete with the Privy modal closure
+            const timer = setTimeout(() => {
+                handleOnboard().then(() => fetchCircleWallet());
+            }, 500);
+            return () => clearTimeout(timer);
         }
     }, [ready, authenticated, user]);
 
+    const fetchCircleWallet = async () => {
+        if (!user?.id) return;
+        try {
+            const res = await fetch(`/api/wallet?userId=${user.id}`);
+            const data = await res.json();
+            if (data.success) {
+                setCircleWallet(data.wallet);
+                // Also fetch initial balance
+                const balRes = await fetch(`/api/wallet/balance?userId=${user.id}`);
+                const balData = await balRes.json();
+                if (balData.success) {
+                    setBalance(parseFloat(balData.balance) || 0);
+                }
+            }
+        } catch (err) {
+            console.error('Failed to fetch Circle wallet:', err);
+        }
+    };
+
     const handleOnboard = async () => {
-        // Check if already onboarded
-        const savedWallet = localStorage.getItem(`wallet_${user?.id}`);
-        if (savedWallet) {
-            try {
-                setCircleWallet(JSON.parse(savedWallet));
-                return;
-            } catch (e) { }
+        if (typeof window !== 'undefined' && localStorage.getItem(`onboarded_${user?.id}`)) {
+            console.log('✅ User already onboarded');
+            return;
         }
 
         try {
+            console.log('🔄 Triggering onboarding...');
             const response = await fetch('/api/onboard', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -150,16 +142,9 @@ export default function Home() {
                 })
             });
 
-            const data = await response.json();
-
-            if (data.success && data.walletAddress) {
-                const wallet = {
-                    address: data.walletAddress,
-                    walletId: data.walletId || 'unknown'
-                };
-                setCircleWallet(wallet);
-                localStorage.setItem(`wallet_${user?.id}`, JSON.stringify(wallet));
-                console.log('✅ Circle wallet linked:', wallet.address);
+            if (response.ok) {
+                localStorage.setItem(`onboarded_${user?.id}`, 'true');
+                console.log('✅ Onboarding complete');
             }
         } catch (err) {
             console.error('Onboarding failed:', err);
@@ -186,7 +171,7 @@ export default function Home() {
 
         setSubs(prev => prev.filter(s => s.id !== id));
         const newNotif = {
-            id: Date.now() + Math.random(),
+            id: Date.now(),
             title: `${sub.name} Unsubscribed`,
             description: `Agent Guard initiated. Future transactions for ${sub.name} are now permanently blocked.`,
             type: 'success',
@@ -197,71 +182,89 @@ export default function Home() {
     };
 
     /**
-     * OPTIMIZATION: Loading States & Auth Flow
-     * 1. If Privy is not ready, show a premium loader (prevents landing page flash)
-     * 2. If authenticated, show the dashboard
-     * 3. If not authenticated, show the landing page
+     * OPTIMIZATION: Instant Render Logic
+     * We only switch to the Authenticated Dashboard if Privy is ready AND authenticated.
+     * Otherwise, we render the Landing Page shell immediately.
      */
-    if (!ready) {
-        return (
-            <div className="min-h-screen bg-[#030305] flex flex-col items-center justify-center gap-6">
-                <div className="relative w-20 h-20">
-                    <div className="absolute inset-0 border-2 border-primary/20 rounded-full" />
-                    <div className="absolute inset-0 border-2 border-t-primary rounded-full animate-spin" />
-                    <img src="/icons/SubGuard.png" alt="SubGuard" className="absolute inset-0 m-auto w-10 h-10 animate-pulse" />
-                </div>
-                <div className="flex flex-col items-center gap-2">
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] animate-pulse">Initializing Guard</span>
-                    <span className="text-[8px] font-bold text-foreground/20 uppercase tracking-widest">Securing Connection...</span>
-                </div>
-            </div>
-        );
-    }
-
-    const handleLogout = async () => {
-        localStorage.removeItem('subguard_active_tab');
-        await logout();
-        window.location.href = '/'; // Forces a full refresh to landing page
-    };
-
-    if (authenticated) {
+    if (ready && authenticated) {
         return (
             <div className="min-h-screen bg-[#030305] text-foreground animate-in fade-in duration-500 flex flex-col md:flex-row">
-                {/* Sidebar Navigation */}
-                <aside className="w-full md:w-64 border-r border-white/5 bg-[#030305] p-6 flex flex-col gap-8 md:min-h-screen sticky top-0">
-                    <div className="flex items-center gap-3 px-2">
-                        <img src="/icons/SubGuard.png" alt="SubGuard" className="w-8 h-8" />
-                        <span className="font-bold text-xl tracking-tighter">SUBGUARD</span>
+                {/* Mobile Header with Hamburger */}
+                <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/5 bg-[#030305] sticky top-0 z-50">
+                    <div className="flex items-center gap-3">
+                        <img src="/icons/SubGuard.png" alt="SubGuard" className="w-7 h-7" />
+                        <span className="font-bold text-lg tracking-tighter">SUBGUARD</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsNotifOpen(!isNotifOpen)}
+                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-foreground/40 transition-colors relative"
+                        >
+                            <Bell className="w-5 h-5" />
+                            {notifications.length > 0 && (
+                                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary" />
+                            )}
+                        </button>
+                        <button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-foreground/60 transition-colors"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile Menu Overlay */}
+                {isMobileMenuOpen && (
+                    <div className="lg:hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
+                )}
+
+                {/* Sidebar Navigation - Slide-in on mobile, fixed on desktop */}
+                <aside className={cn(
+                    "fixed lg:static inset-y-0 left-0 z-50 w-64 border-r border-white/5 bg-[#030305] p-6 flex flex-col gap-8 transition-transform duration-300 lg:translate-x-0 lg:min-h-screen",
+                    isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+                )}>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 px-2">
+                            <img src="/icons/SubGuard.png" alt="SubGuard" className="w-8 h-8" />
+                            <span className="font-bold text-xl tracking-tighter">SUBGUARD</span>
+                        </div>
+                        <button
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="lg:hidden p-2 rounded-lg hover:bg-white/5"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
                     </div>
 
                     <nav className="flex flex-col gap-2 flex-grow">
                         <NavButton
                             active={activeTab === 'dashboard'}
-                            onClick={() => setActiveTab('dashboard')}
+                            onClick={() => { setActiveTab('dashboard'); setIsMobileMenuOpen(false); }}
                             icon={<Cpu className="w-4 h-4" />}
                             label="Dashboard"
                         />
                         <NavButton
                             active={activeTab === 'subscriptions'}
-                            onClick={() => setActiveTab('subscriptions')}
+                            onClick={() => { setActiveTab('subscriptions'); setIsMobileMenuOpen(false); }}
                             icon={<Zap className="w-4 h-4" />}
                             label="Subscriptions"
                         />
                         <NavButton
                             active={activeTab === 'cards'}
-                            onClick={() => setActiveTab('cards')}
+                            onClick={() => { setActiveTab('cards'); setIsMobileMenuOpen(false); }}
                             icon={<CreditCard className="w-4 h-4" />}
                             label="Virtual Cards"
                         />
                         <NavButton
                             active={activeTab === 'transactions'}
-                            onClick={() => setActiveTab('transactions')}
+                            onClick={() => { setActiveTab('transactions'); setIsMobileMenuOpen(false); }}
                             icon={<Activity className="w-4 h-4" />}
                             label="Transactions"
                         />
                         <NavButton
                             active={activeTab === 'settings'}
-                            onClick={() => setActiveTab('settings')}
+                            onClick={() => { setActiveTab('settings'); setIsMobileMenuOpen(false); }}
                             icon={<Settings className="w-4 h-4" />}
                             label="Settings"
                         />
@@ -270,27 +273,38 @@ export default function Home() {
                     <div className="pt-6 border-t border-white/5 space-y-4">
                         <div className="px-2">
                             <p className="text-[10px] font-black tracking-[0.3em] text-foreground/20 uppercase mb-4">Account</p>
-                            <button
-                                onClick={() => setIsWalletOpen(true)}
-                                className="w-full flex items-center justify-between group"
-                            >
-                                <div className="flex flex-col items-start gap-0.5">
-                                    <span className="text-xs font-bold text-foreground/80 group-hover:text-primary transition-colors">View Account</span>
-                                    <span className="text-[10px] font-mono text-foreground/30 truncate w-32 text-left">
-                                        {user?.wallet?.address?.slice(0, 6)}...{user?.wallet?.address?.slice(-4)}
-                                    </span>
-                                </div>
-                                <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center group-hover:bg-primary/10 group-hover:border-primary/20 transition-all">
-                                    <ArrowUpRight className="w-4 h-4 text-foreground/20 group-hover:text-primary" />
-                                </div>
-                            </button>
+                            <div className="space-y-2">
+                                <button
+                                    onClick={() => { setIsWalletOpen(true); setIsMobileMenuOpen(false); }}
+                                    className="w-full flex items-center justify-between group"
+                                >
+                                    <div className="flex flex-col items-start gap-0.5">
+                                        <span className="text-xs font-bold text-foreground/80 group-hover:text-primary transition-colors">View Account</span>
+                                        <span className="text-[10px] font-mono text-foreground/30 truncate w-32 text-left">
+                                            {circleWallet?.address ? `${circleWallet.address.slice(0, 6)}...${circleWallet.address.slice(-4)}` : '0x...'}
+                                        </span>
+                                    </div>
+                                    <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center group-hover:bg-primary/10 group-hover:border-primary/20 transition-all">
+                                        <ArrowUpRight className="w-4 h-4 text-foreground/20 group-hover:text-primary" />
+                                    </div>
+                                </button>
+
+                                {/* Mobile Sign Out Button */}
+                                <button
+                                    onClick={() => logout()}
+                                    className="w-full flex items-center justify-between group p-2 rounded-xl border border-white/5 bg-white/5 lg:hidden"
+                                >
+                                    <span className="text-xs font-bold text-foreground/60 group-hover:text-red-500 transition-colors">Sign Out</span>
+                                    <Power className="w-4 h-4 text-foreground/20 group-hover:text-red-500 transition-colors" />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </aside>
 
                 <div className="flex-grow flex flex-col min-h-screen overflow-hidden">
-                    {/* Internal Dashboard Header */}
-                    <div className="flex items-center justify-between px-10 py-8 border-b border-white/5">
+                    {/* Internal Dashboard Header - hidden on mobile/tablet */}
+                    <div className="hidden lg:flex items-center justify-between px-6 lg:px-8 py-4 lg:py-6 border-b border-white/5">
                         <div className="flex items-center gap-3 text-xs font-medium tracking-tight">
                             <span className="text-foreground/30 capitalize">{activeTab}</span>
                             <span className="text-foreground/10">/</span>
@@ -313,21 +327,22 @@ export default function Home() {
                             </button>
                             <button className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
                                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-black text-primary">SG</div>
-                                <span className="text-[10px] font-black text-white/60 tracking-widest uppercase">{user?.email?.address?.slice(0, 10) || 'User'}...</span>
+                                <span className="text-[10px] font-black text-white/60 tracking-widest uppercase">SubGuard Admin</span>
                             </button>
                             <button
-                                onClick={handleLogout}
-                                className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest transition-colors"
+                                onClick={() => logout()}
+                                className="p-2.5 rounded-xl bg-red-500/5 border border-red-500/10 hover:bg-red-500/10 text-red-500/60 transition-colors"
+                                title="Sign Out"
                             >
-                                Sign Out
+                                <Power className="w-5 h-5" />
                             </button>
                         </div>
                     </div>
 
                     <div className="flex-grow flex overflow-hidden">
                         {/* Content Area */}
-                        <main className="flex-grow p-10 overflow-y-auto">
-                            {activeTab === 'dashboard' && <DashboardOverview onOpenWallet={() => setIsWalletOpen(true)} balance={userBalance} />}
+                        <main className="flex-grow p-4 md:p-6 lg:p-8 overflow-y-auto overflow-x-hidden">
+                            {activeTab === 'dashboard' && <DashboardOverview onOpenWallet={() => setIsWalletOpen(true)} balance={balance} />}
                             {activeTab === 'subscriptions' && <SubscriptionList subs={subs} toggleSub={toggleSub} onUnsubscribe={handleUnsubscribe} />}
                             {activeTab === 'cards' && (
                                 showTierSelection ? (
@@ -335,14 +350,9 @@ export default function Home() {
                                         currentTier={currentTier.id}
                                         onSelect={(tier) => {
                                             setCurrentTier({ id: tier.id as any, name: tier.name, maxCards: tier.maxCards });
-                                            if (user?.id) {
-                                                localStorage.setItem(`tier_${user.id}`, tier.id);
-                                            }
                                             setShowTierSelection(false);
                                         }}
                                         onClose={() => setShowTierSelection(false)}
-                                        userId={user?.id}
-                                        userBalance={userBalance}
                                     />
                                 ) : (
                                     <CardsManager
@@ -360,16 +370,21 @@ export default function Home() {
                             {activeTab === 'settings' && <SettingsView />}
                         </main>
 
-                        {/* Right Sidebar - Transmissions */}
-                        {activeTab === 'dashboard' && <Transmissions />}
+                        {/* Right Sidebar - Transmissions (hidden on mobile/tablet) */}
+                        {activeTab === 'dashboard' && (
+                            <div className="hidden lg:block">
+                                <Transmissions />
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 <WalletPopup
                     isOpen={isWalletOpen}
                     onClose={() => setIsWalletOpen(false)}
-                    address={circleWallet?.address || user?.wallet?.address || '0x00...00'}
+                    address={circleWallet?.address || '0x...'}
                     userId={user?.id}
+                    balance={balance}
                 />
 
                 {isFlowOpen && (

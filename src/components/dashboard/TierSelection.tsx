@@ -110,18 +110,18 @@ export default function TierSelection({ onSelect, currentTier, onClose, userId, 
     };
 
     return (
-        <div className="relative space-y-12 py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="relative space-y-8 lg:space-y-12 py-4 lg:py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Close Button */}
             <button
                 onClick={onClose}
-                className="absolute top-0 right-0 p-3 rounded-full bg-white/5 border border-white/5 text-foreground/40 hover:text-white hover:bg-white/10 transition-all z-10"
+                className="absolute top-0 right-0 p-2 sm:p-3 rounded-full bg-white/5 border border-white/5 text-foreground/40 hover:text-white hover:bg-white/10 transition-all z-10"
             >
                 <X className="w-5 h-5" />
             </button>
 
-            <div className="text-center space-y-4">
-                <h2 className="text-4xl font-bold tracking-tight text-white">Select Your Shield Tier</h2>
-                <p className="text-foreground/40 max-w-lg mx-auto text-sm leading-relaxed">
+            <div className="text-center space-y-4 px-4">
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">Select Your Shield Tier</h2>
+                <p className="text-foreground/40 max-w-lg mx-auto text-xs sm:text-sm leading-relaxed">
                     Choose the level of protection that fits your treasury needs. Each tier unlocks more autonomous virtual cards.
                 </p>
                 {/* Balance Display */}

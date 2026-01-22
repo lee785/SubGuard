@@ -94,12 +94,12 @@ export default function WalletPopup({ isOpen, onClose, address, userId, balance 
     };
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center animate-in fade-in duration-300">
             <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
 
-            <div className="relative w-full max-w-md glass-card bg-[#0a0a0c] border-white/10 overflow-hidden animate-in zoom-in-95 duration-300 shadow-2xl">
+            <div className="relative w-full h-[90vh] sm:h-auto sm:max-h-[85vh] sm:max-w-md glass-card bg-[#0a0a0c] border-white/10 overflow-hidden animate-in slide-in-from-bottom sm:zoom-in-95 duration-300 shadow-2xl rounded-t-3xl sm:rounded-2xl">
                 {/* Header */}
-                <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <div className="p-4 sm:p-6 border-b border-white/5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         {view !== 'main' && (
                             <button onClick={() => setView('main')} className="p-1 hover:bg-white/5 rounded-lg transition-colors">

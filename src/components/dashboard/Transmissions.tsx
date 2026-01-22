@@ -57,8 +57,8 @@ const MOCK_TRANSMISSIONS: Transmission[] = [
 
 export default function Transmissions() {
     return (
-        <aside className="w-[380px] border-l border-white/5 bg-[#030305] flex flex-col h-full sticky top-0">
-            <div className="p-8 pb-4 flex items-center justify-between">
+        <aside className="w-[320px] border-l border-white/5 bg-[#030305] flex flex-col h-full sticky top-0">
+            <div className="p-6 pb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <h3 className="text-sm font-bold tracking-widest text-white uppercase italic">Transmissions</h3>
                     <div className="group relative">
@@ -74,7 +74,7 @@ export default function Transmissions() {
                 </div>
             </div>
 
-            <div className="flex-grow overflow-y-auto px-8 space-y-8 py-6">
+            <div className="flex-grow overflow-y-auto px-6 space-y-8 py-6">
                 {MOCK_TRANSMISSIONS.map((item, idx) => (
                     <div key={item.id} className="relative pl-6">
                         {/* Timeline line */}
@@ -107,7 +107,7 @@ export default function Transmissions() {
                 ))}
             </div>
 
-            <div className="p-8 pt-0">
+            <div className="p-6 pt-0">
                 <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4">
                     <div className="flex items-center gap-3">
                         <Activity className="w-4 h-4 text-primary" />

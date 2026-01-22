@@ -26,12 +26,12 @@ SubGuard is a next-generation dApp that protects users from subscription fraud a
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │   Next.js App   │────▶│  Backend API    │────▶│  Circle SDK     │
-│   (Frontend)    │     │  (fly.io)       │     │  (Arc Testnet)  │
+│   (Frontend)    │     │                 │     │  (Arc Testnet)  │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
         │                       │
         ▼                       ▼
 ┌─────────────────┐     ┌─────────────────┐
-│  Privy Auth     │     │  SQLite DB      │
+│  Privy Auth     │     │    ---------      │
 └─────────────────┘     └─────────────────┘
 ```
 
@@ -42,7 +42,7 @@ SubGuard is a next-generation dApp that protects users from subscription fraud a
 ### Prerequisites
 - Node.js 18+
 - npm or yarn
-- Circle Developer Account (API keys)
+- Circle Developer Account (wallet's and more)
 - Privy Account (for authentication)
 
 ### Installation

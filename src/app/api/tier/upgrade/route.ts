@@ -6,12 +6,8 @@ import { checkRateLimit } from '@/lib/ratelimit/simple-limiter';
 import { tierUpgradeSchema } from '@/lib/validation/schemas';
 import { z } from 'zod';
 
-// Admin wallet - validated at startup
+// Admin wallet - will be validated at runtime
 const SUBGUARD_ADMIN_WALLET = process.env.SUBGUARD_ADMIN_WALLET;
-
-if (!SUBGUARD_ADMIN_WALLET) {
-    throw new Error('SUBGUARD_ADMIN_WALLET environment variable is not configured');
-}
 
 // Tier pricing in USDC
 const TIER_PRICES: Record<string, number> = {
@@ -43,6 +39,15 @@ export async function POST(req: Request) {
             return NextResponse.json(
                 { success: false, error: 'Unauthorized. Please sign in.' },
                 { status: 401 }
+            );
+        }
+
+        // Runtime check for admin wallet
+        if (!SUBGUARD_ADMIN_WALLET) {
+            console.error('[Tier Upgrade] SUBGUARD_ADMIN_WALLET is not configured in environment variables.');
+            return NextResponse.json(
+                { success: false, error: 'Server configuration error. Please contact admin.' },
+                { status: 500 }
             );
         }
 

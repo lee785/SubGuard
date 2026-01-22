@@ -64,7 +64,7 @@ const MOCK_TRANSACTIONS = [
 ];
 
 export default function Home() {
-    const { login, authenticated, user, logout, ready } = usePrivy();
+    const { login, authenticated, user, logout, ready, getAccessToken } = usePrivy();
     const [isAgentActive, setIsAgentActive] = useState(true);
     const [isWalletOpen, setIsWalletOpen] = useState(false);
     const [isFlowOpen, setIsFlowOpen] = useState(false);
@@ -97,23 +97,29 @@ export default function Home() {
     // Trigger onboarding and wallet creation when user authenticates
     useEffect(() => {
         if (ready && authenticated && user) {
-            // Add a small delay so the onboarding fetch doesn't compete with the Privy modal closure
-            const timer = setTimeout(() => {
-                handleOnboard().then(() => fetchCircleWallet());
-            }, 500);
-            return () => clearTimeout(timer);
+            fetchCircleWallet();
+            handleOnboard();
         }
     }, [ready, authenticated, user]);
 
     const fetchCircleWallet = async () => {
         if (!user?.id) return;
         try {
-            const res = await fetch(`/api/wallet?userId=${user.id}`);
+            const token = await getAccessToken();
+            const res = await fetch(`/api/wallet?userId=${user.id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             const data = await res.json();
             if (data.success) {
                 setCircleWallet(data.wallet);
                 // Also fetch initial balance
-                const balRes = await fetch(`/api/wallet/balance?userId=${user.id}`);
+                const balRes = await fetch(`/api/wallet/balance?userId=${user.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const balData = await balRes.json();
                 if (balData.success) {
                     setBalance(parseFloat(balData.balance) || 0);
@@ -125,6 +131,7 @@ export default function Home() {
     };
 
     const handleOnboard = async () => {
+        if (!user?.id) return;
         if (typeof window !== 'undefined' && localStorage.getItem(`onboarded_${user?.id}`)) {
             console.log('✅ User already onboarded');
             return;
@@ -132,9 +139,13 @@ export default function Home() {
 
         try {
             console.log('🔄 Triggering onboarding...');
+            const token = await getAccessToken();
             const response = await fetch('/api/onboard', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({
                     userId: user?.id,
                     email: user?.email?.address || 'user@example.com',
@@ -454,7 +465,7 @@ export default function Home() {
         <div className="min-h-screen flex flex-col pt-0 bg-[#030305]">
             {/* Navigation */}
             <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#030305]/80 backdrop-blur-md">
-                <div className="max-w-[1240px] mx-auto px-6 h-16 flex items-center justify-between">
+                <div className="max-w-[1100px] mx-auto px-6 h-14 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <img src="/icons/SubGuard.png" alt="SubGuard" className="w-10 h-10 object-contain" />
                         <span className="font-bold text-xl tracking-tighter">SUBGUARD</span>
@@ -476,19 +487,19 @@ export default function Home() {
             </nav>
 
             {/* Hero Section */}
-            <section className="pt-32 pb-16 px-6">
-                <div className="max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <section className="pt-20 pb-8 px-6">
+                <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div className="space-y-8 animate-in fade-in slide-in-from-left duration-1000 md:-ml-12">
                         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 w-fit">
                             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                             <span className="text-[10px] font-bold text-primary uppercase tracking-widest">LIVE ON ARC TESTNET</span>
                         </div>
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-[0.95]">
+                        <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold tracking-tight leading-[0.95]">
                             <span className="text-white">Your USDC Treasury,</span> <br />
                             <span className="text-primary italic">Autonomously Guarded.</span>
                         </h1>
-                        <p className="text-lg text-foreground/50 max-w-xl leading-relaxed">
-                            Protect your assets from unwanted recurring charges. The first AI-powerd subscription gatekeeper built on Arc L1 architecture for institutional-grade security.
+                        <p className="text-base text-foreground/50 max-w-lg leading-relaxed">
+                            Protect your assets from unwanted recurring charges. The first AI-powerd subscription gatekeeper built on Arc L1 architecture.
                         </p>
                         <div className="flex flex-wrap gap-4">
                             <button onClick={login} className="btn-primary px-10 py-4 uppercase">Secure Your Assets</button>
@@ -520,8 +531,8 @@ export default function Home() {
                         {/* Floating Cards Composition */}
                         <div className="relative w-full h-full">
                             {/* Netflix Card */}
-                            <div className="absolute top-[35%] left-[0%] z-20 animate-float shadow-2xl">
-                                <div className="glass-card bg-[#0a0a0c]/90 border-white/10 p-5 w-72">
+                            <div className="absolute top-[35%] left-[0%] z-20 animate-float shadow-2xl scale-[0.75]">
+                                <div className="glass-card bg-[#0a0a0c]/90 border-white/10 p-4 w-64">
                                     <div className="flex items-center gap-4">
                                         <div className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 overflow-hidden shrink-0">
                                             <img src="/icons/Netflix.png" alt="Netflix" className="w-10 h-10 object-contain" />
@@ -544,8 +555,8 @@ export default function Home() {
                             </div>
 
                             {/* Disney+ Card */}
-                            <div className="absolute top-[10%] right-[5%] z-10 animate-float-delayed shadow-2xl opacity-60">
-                                <div className="glass-card bg-[#0a0a0c]/80 border-white/5 p-4 w-56 space-y-3 opacity-60">
+                            <div className="absolute top-[10%] right-[5%] z-10 animate-float-delayed shadow-2xl opacity-60 scale-[0.75]">
+                                <div className="glass-card bg-[#0a0a0c]/80 border-white/5 p-3 w-48 space-y-2 opacity-60">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center border border-white/5 overflow-hidden">
                                             <img src="/icons/Disney.png" alt="Disney+" className="w-7 h-7 object-contain" />
@@ -560,7 +571,7 @@ export default function Home() {
                             </div>
 
                             {/* SubAgent Card (New) */}
-                            <div className="absolute top-[50%] right-[0%] z-20 animate-float shadow-2xl scale-110">
+                            <div className="absolute top-[50%] right-[0%] z-20 animate-float shadow-2xl scale-[0.85]">
                                 <div className="glass-card bg-[#0a0a0c]/90 border-white/10 p-4 w-60 space-y-3">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
@@ -578,7 +589,7 @@ export default function Home() {
                             </div>
 
                             {/* Unknown SaaS Card (Blocked) */}
-                            <div className="absolute bottom-[15%] right-[0%] z-20 animate-float shadow-2xl rotate-3 scale-110">
+                            <div className="absolute bottom-[15%] right-[0%] z-20 animate-float shadow-2xl rotate-3 scale-[0.85]">
                                 <div className="glass-card bg-red-500/5 border-red-500/20 p-6 w-72 space-y-4">
                                     <div className="flex items-center gap-4">
                                         <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
@@ -639,8 +650,8 @@ export default function Home() {
 
             {/* Advanced Mitigation */}
             <section className="section-container">
-                <div className="mb-16">
-                    <h2 className="text-5xl font-bold mb-4">Advanced Mitigation.</h2>
+                <div className="mb-12">
+                    <h2 className="text-3xl font-bold mb-4">Advanced Mitigation.</h2>
                     <p className="text-foreground/40 max-w-lg">SubGuard implements zero-trust logic at the wallet level, ensuring every transaction aligns with protocol parameters.</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-white/10 rounded-[32px] overflow-hidden">
@@ -723,7 +734,7 @@ export default function Home() {
 
             {/* CTA Banner */}
             <section className="px-6 py-20">
-                <div className="max-w-[1240px] mx-auto rounded-[40px] bg-primary p-20 text-center space-y-8 shadow-[0_20px_50px_rgba(34,197,94,0.2)]">
+                <div className="max-w-[1100px] mx-auto rounded-[40px] bg-primary p-20 text-center space-y-8 shadow-[0_20px_50px_rgba(34,197,94,0.2)]">
                     <h2 className="text-4xl md:text-6xl font-bold text-black leading-tight tracking-tight">Secure Your Operations.</h2>
                     <p className="text-black/70 max-w-xl mx-auto font-medium text-lg">The standard for DAO treasury management and high-net-worth individual security on the Arc Network.</p>
                     <div className="flex flex-wrap justify-center gap-6 pt-10">
@@ -735,7 +746,7 @@ export default function Home() {
 
             {/* Footer */}
             <footer className="pt-24 pb-12 px-6 relative border-t border-white/5">
-                <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 pb-16">
+                <div className="max-w-[1100px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 pb-16">
                     <div className="md:col-span-3 space-y-6 md:-ml-16">
                         <div className="flex items-center gap-2">
                             <img src="/icons/SubGuard.png" alt="SubGuard" className="w-10 h-10 object-contain" />
@@ -784,15 +795,15 @@ export default function Home() {
                     </div>
                 </div>
 
-                <div className="max-w-[1400px] mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+                <div className="max-w-[1100px] mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
                     <p className="text-xs text-foreground/20 font-bold uppercase tracking-widest md:-ml-16">
                         © 2026 SUBGUARD · ALL RIGHTS RESERVED
                     </p>
                     <div className="flex items-center gap-6 md:-mr-16">
-                        <div className="flex items-center gap-2 group cursor-not-allowed">
+                        <a href="https://github.com/lee785/SubGuard" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group cursor-pointer transition-colors">
                             <Github className="w-5 h-5 text-foreground/20 group-hover:text-white transition-colors" />
-                            <span className="text-[10px] font-bold text-foreground/20 uppercase tracking-widest">GitHub <span className="text-[10px] ml-1 bg-white/5 px-1 py-0.5 rounded opacity-50">Soon</span></span>
-                        </div>
+                            <span className="text-[10px] font-bold text-foreground/20 uppercase tracking-widest group-hover:text-white transition-colors">GitHub</span>
+                        </a>
                         <div className="flex items-center gap-2 group cursor-not-allowed">
                             <svg viewBox="0 0 24 24" className="w-5 h-5 text-foreground/20 group-hover:text-white transition-colors fill-current">
                                 <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 11.756 11.756 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C.533 9.048-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
@@ -822,12 +833,12 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 
 function MitigationCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
     return (
-        <div className="p-12 space-y-6 bg-white/[0.01] border-r border-white/10 last:border-r-0 hover:bg-white/[0.03] transition-colors group">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+        <div className="p-8 space-y-4 bg-white/[0.01] border-r border-white/10 last:border-r-0 hover:bg-white/[0.03] transition-colors group">
+            <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 {icon}
             </div>
-            <h3 className="text-2xl font-bold">{title}</h3>
-            <p className="text-foreground/40 leading-relaxed text-sm">{description}</p>
+            <h3 className="text-xl font-bold">{title}</h3>
+            <p className="text-foreground/40 leading-relaxed text-xs">{description}</p>
         </div>
     );
 }

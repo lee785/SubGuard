@@ -80,9 +80,9 @@ export default function DashboardOverview({
     return (
         <div className="space-y-6 lg:space-y-10 animate-in fade-in duration-700">
             {/* Treasury Balance Hub */}
-            <div className="glass-card p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-white/[0.03] to-transparent border-white/5 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 lg:p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <Library className="w-10 lg:w-16 h-10 lg:h-16 text-white" />
+            <div className="glass-card p-4 sm:p-5 lg:p-6 bg-gradient-to-br from-white/[0.03] to-transparent border-white/5 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 lg:p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <Library className="w-8 lg:w-12 h-8 lg:h-12 text-white" />
                 </div>
 
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-8">
@@ -91,10 +91,10 @@ export default function DashboardOverview({
                             <Library className="w-4 h-4 text-foreground/40" />
                             <h3 className="text-[10px] font-black tracking-[0.3em] text-foreground/40 uppercase">Treasury Balance</h3>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                             <div className="flex items-baseline gap-2 sm:gap-4">
-                                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-medium tracking-tight text-white">${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                                <p className="text-base sm:text-lg lg:text-xl font-bold text-primary/60 tracking-tight">USDC</p>
+                                <h2 className="text-xl sm:text-2xl lg:text-3xl font-medium tracking-tight text-white">${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                <p className="text-sm sm:text-base lg:text-lg font-bold text-primary/60 tracking-tight">USDC</p>
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="flex items-center gap-1 text-primary text-xs font-bold">
@@ -116,7 +116,7 @@ export default function DashboardOverview({
                         </button>
                         <button
                             onClick={onOpenWallet}
-                            className="px-6 sm:px-8 py-3 rounded-xl bg-primary text-black text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_4px_20px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2"
+                            className="px-5 sm:px-6 py-2.5 rounded-xl bg-primary text-black text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_4px_20px_rgba(34,197,94,0.3)] flex items-center justify-center gap-2"
                         >
                             <Plus className="w-3 h-3 stroke-[4px]" />
                             Top Up Assets

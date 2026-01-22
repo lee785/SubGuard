@@ -33,7 +33,7 @@ export default function SubscriptionList({ subs, toggleSub, onUnsubscribe }: Sub
         <div className="space-y-4">
             <div className="space-y-4">
                 {displayedSubs.map(sub => (
-                    <div key={sub.id} className="glass-card p-4 lg:p-6 group border-white/5 hover:border-primary/20 bg-white/[0.01]">
+                    <div key={sub.id} className="glass-card p-4 lg:p-5 group border-white/5 hover:border-primary/20 bg-white/[0.01]">
                         {/* Mobile Layout */}
                         <div className="lg:hidden space-y-4">
                             <div className="flex items-center gap-4">
@@ -80,7 +80,7 @@ export default function SubscriptionList({ subs, toggleSub, onUnsubscribe }: Sub
                         {/* Desktop Layout */}
                         <div className="hidden lg:flex items-center justify-between">
                             <div className="flex items-center gap-6">
-                                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center overflow-hidden border border-white/5 group-hover:bg-white/10 transition-colors">
+                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center overflow-hidden border border-white/5 group-hover:bg-white/10 transition-colors">
                                     {sub.icon.startsWith('/') ? (
                                         <img src={sub.icon} alt={sub.name} className="w-8 h-8 object-contain" />
                                     ) : (

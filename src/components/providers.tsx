@@ -27,7 +27,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 },
             }}
             onSuccess={() => {
-                console.log('✅ Privy login successful');
+                console.log('✅ Privy login successful. Refreshing to sync...');
+                window.location.reload();
             }}
         >
             {children}

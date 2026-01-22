@@ -118,11 +118,11 @@ export default function WalletPopup({ isOpen, onClose, address, userId, balance 
                 <div className="p-8">
                     {view === 'main' && (
                         <div className="space-y-8">
-                            <div className="text-center space-y-2 py-4">
-                                <p className="text-[10px] font-black tracking-[0.3em] text-foreground/30 uppercase">Available Balance</p>
-                                <div className="flex items-baseline justify-center gap-3">
-                                    <h2 className="text-5xl font-medium tracking-tight text-white">{currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
-                                    <span className="text-xl font-bold text-primary/60">USDC</span>
+                            <div className="text-center space-y-2 py-2">
+                                <p className="text-[9px] font-black tracking-[0.3em] text-foreground/30 uppercase">Available Balance</p>
+                                <div className="flex items-baseline justify-center gap-2">
+                                    <h2 className="text-4xl font-medium tracking-tight text-white">{currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+                                    <span className="text-base font-bold text-primary/60">USDC</span>
                                 </div>
                             </div>
 
@@ -241,14 +241,18 @@ export default function WalletPopup({ isOpen, onClose, address, userId, balance 
 
                             <div className="space-y-3">
                                 <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest">Your Treasury Address</p>
-                                <div className="flex items-center gap-2 p-4 rounded-xl bg-white/[0.02] border border-white/5 overflow-hidden">
-                                    <span className="text-xs font-mono text-foreground/60 truncate flex-grow text-left">{address}</span>
-                                    <button
-                                        onClick={copyAddress}
-                                        className="p-2 hover:bg-white/5 rounded-lg transition-colors text-primary"
-                                    >
-                                        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                                    </button>
+                                <div className="flex items-center gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/5 overflow-hidden">
+                                    <span className="text-[11px] font-mono text-foreground/60 truncate flex-grow text-left">
+                                        {address === '0x...' ? 'Syncing with Arc Testnet...' : address}
+                                    </span>
+                                    {address !== '0x...' && (
+                                        <button
+                                            onClick={copyAddress}
+                                            className="p-2 hover:bg-white/5 rounded-lg transition-colors text-primary"
+                                        >
+                                            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 

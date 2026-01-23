@@ -374,32 +374,34 @@ export default function Home() {
                     <div className="flex-grow flex overflow-hidden">
                         {/* Content Area */}
                         <main className="flex-grow p-4 md:p-6 lg:p-8 overflow-y-auto overflow-x-hidden">
-                            {activeTab === 'dashboard' && <DashboardOverview onOpenWallet={() => setIsWalletOpen(true)} balance={balance} onRefresh={fetchCircleWallet} />}
-                            {activeTab === 'subscriptions' && <SubscriptionList subs={subs} toggleSub={toggleSub} onUnsubscribe={handleUnsubscribe} />}
-                            {activeTab === 'cards' && (
-                                showTierSelection ? (
-                                    <TierSelection
-                                        currentTier={currentTier.id}
-                                        onSelect={(tier) => {
-                                            setCurrentTier({ id: tier.id as any, name: tier.name, maxCards: tier.maxCards });
-                                            setShowTierSelection(false);
-                                        }}
-                                        onClose={() => setShowTierSelection(false)}
-                                    />
-                                ) : (
-                                    <CardsManager
-                                        currentTier={currentTier}
-                                        userCards={userCards}
-                                        onGenerateCard={() => setIsFlowOpen(true)}
-                                        onUpgrade={() => setShowTierSelection(true)}
-                                        onUpdateCard={handleUpdateCard}
-                                        initialSelectedCard={cardToView}
-                                        onCloseDetails={() => setCardToView(null)}
-                                    />
-                                )
-                            )}
-                            {activeTab === 'transactions' && <TransactionHistory transactions={MOCK_TRANSACTIONS} />}
-                            {activeTab === 'settings' && <SettingsView />}
+                            <div className="max-w-[1050px] mx-auto w-full">
+                                {activeTab === 'dashboard' && <DashboardOverview onOpenWallet={() => setIsWalletOpen(true)} balance={balance} onRefresh={fetchCircleWallet} />}
+                                {activeTab === 'subscriptions' && <SubscriptionList subs={subs} toggleSub={toggleSub} onUnsubscribe={handleUnsubscribe} />}
+                                {activeTab === 'cards' && (
+                                    showTierSelection ? (
+                                        <TierSelection
+                                            currentTier={currentTier.id}
+                                            onSelect={(tier) => {
+                                                setCurrentTier({ id: tier.id as any, name: tier.name, maxCards: tier.maxCards });
+                                                setShowTierSelection(false);
+                                            }}
+                                            onClose={() => setShowTierSelection(false)}
+                                        />
+                                    ) : (
+                                        <CardsManager
+                                            currentTier={currentTier}
+                                            userCards={userCards}
+                                            onGenerateCard={() => setIsFlowOpen(true)}
+                                            onUpgrade={() => setShowTierSelection(true)}
+                                            onUpdateCard={handleUpdateCard}
+                                            initialSelectedCard={cardToView}
+                                            onCloseDetails={() => setCardToView(null)}
+                                        />
+                                    )
+                                )}
+                                {activeTab === 'transactions' && <TransactionHistory transactions={MOCK_TRANSACTIONS} />}
+                                {activeTab === 'settings' && <SettingsView />}
+                            </div>
                         </main>
 
                         {/* Right Sidebar - Transmissions (hidden on mobile/tablet) */}
@@ -486,7 +488,7 @@ export default function Home() {
         <div className="min-h-screen flex flex-col pt-0 bg-[#030305]">
             {/* Navigation */}
             <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#030305]/80 backdrop-blur-md">
-                <div className="max-w-[1400px] mx-auto px-10 h-16 flex items-center justify-between">
+                <div className="max-w-[1200px] mx-auto px-10 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <img src="/icons/SubGuard.png" alt="SubGuard" className="w-10 h-10 object-contain" />
                         <span className="font-bold text-xl tracking-tighter">SUBGUARD</span>
@@ -508,8 +510,8 @@ export default function Home() {
             </nav>
 
             {/* Hero Section */}
-            <section className="pt-20 pb-8 px-6">
-                <div className="max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <section className="pt-11 pb-8 px-6">
+                <div className="max-w-[1050px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div className="space-y-8 animate-in fade-in slide-in-from-left duration-1000 md:-ml-12">
                         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 w-fit">
                             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -531,7 +533,7 @@ export default function Home() {
                         </div>
 
                         {/* Hero Stats */}
-                        <div className="pt-8 flex items-center gap-12 border-t border-white/5">
+                        <div className="pt-3 flex items-center gap-12 border-t border-white/5">
                             <div className="space-y-1">
                                 <p className="text-2xl font-medium tracking-tighter text-foreground/70">99.9%</p>
                                 <p className="text-[9px] font-bold text-foreground/20 uppercase tracking-widest">AI Accuracy</p>
@@ -555,9 +557,9 @@ export default function Home() {
                             <div className="absolute top-[35%] left-[0%] z-20 animate-float shadow-2xl scale-[0.75]">
                                 <div className="glass-card bg-[#0a0a0c]/90 border-white/10 p-4 w-64 relative">
                                     {/* Safe Indicator */}
-                                    <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_12px_#22c55e]" />
-                                        <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Safe</span>
+                                    <div className="absolute top-3 right-3 flex items-center gap-1">
+                                        <div className="w-1 h-1 rounded-full bg-primary animate-pulse shadow-[0_0_8px_#22c55e]" />
+                                        <span className="text-[7px] font-black text-primary uppercase tracking-[0.2em]">Safe</span>
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <div className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 overflow-hidden shrink-0">
@@ -643,7 +645,7 @@ export default function Home() {
             </section>
 
             {/* Partner Ticker */}
-            <div className="border-y border-white/10 bg-white/[0.01] py-14 overflow-hidden">
+            <div className="border-y border-white/10 bg-white/[0.01] py-7 overflow-hidden">
                 <div className="w-full px-6 flex items-center gap-20">
                     <div className="flex items-center gap-12 shrink-0 ml-4 md:ml-12 lg:ml-20">
                         <span className="text-[11px] font-black tracking-[0.7em] text-foreground/30 uppercase whitespace-nowrap">POWERED BY</span>
@@ -756,7 +758,7 @@ export default function Home() {
 
             {/* CTA Banner */}
             <section className="px-6 py-20">
-                <div className="max-w-[1100px] mx-auto rounded-[40px] bg-primary p-20 text-center space-y-8 shadow-[0_20px_50px_rgba(34,197,94,0.2)]">
+                <div className="max-w-[1050px] mx-auto rounded-[40px] bg-primary p-11 text-center space-y-8 shadow-[0_20px_50px_rgba(34,197,94,0.2)]">
                     <h2 className="text-4xl md:text-6xl font-bold text-black leading-tight tracking-tight">Secure Your Operations.</h2>
                     <p className="text-black/70 max-w-xl mx-auto font-medium text-lg">The standard for DAO treasury management and high-net-worth individual security on the Arc Network.</p>
                     <div className="flex flex-wrap justify-center gap-6 pt-10">
@@ -767,8 +769,8 @@ export default function Home() {
             </section>
 
             {/* Footer */}
-            <footer className="pt-24 pb-12 px-6 relative border-t border-white/5">
-                <div className="max-w-[1100px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 pb-16">
+            <footer className="pt-14 pb-12 px-6 relative border-t border-white/5">
+                <div className="max-w-[1050px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 pb-16">
                     <div className="md:col-span-3 space-y-6 md:-ml-16">
                         <div className="flex items-center gap-2">
                             <img src="/icons/SubGuard.png" alt="SubGuard" className="w-10 h-10 object-contain" />
@@ -971,7 +973,7 @@ function LoadingOverlay() {
                         Synchronizing
                     </span>
                     <span className="text-[8px] font-bold text-foreground/20 uppercase tracking-[0.3em]">
-                        Arc L1 Security Layer
+                        Arc L1 Security Agent
                     </span>
                 </div>
             </div>

@@ -42,6 +42,9 @@ stripe
 final_secret.js
 create_wallet_set.js
 test_onboard.js
+inspect_sdk.js
+test_list.js
+verify_recovery_live.js
 
 # Database files
 *.db

@@ -82,15 +82,15 @@ export default function DashboardOverview({
 
     const displayedSubs = showAll ? mockSubs : mockSubs.slice(0, 3);
     return (
-        <div className="space-y-6 lg:space-y-10 animate-in fade-in duration-700">
+        <div className="space-y-4 lg:space-y-5 animate-in fade-in duration-700">
             {/* Treasury Balance Hub */}
-            <div className="glass-card p-4 sm:p-5 lg:p-6 bg-gradient-to-br from-white/[0.03] to-transparent border-white/5 relative overflow-hidden group">
+            <div className="glass-card p-4 sm:p-5 lg:p-4 bg-gradient-to-br from-white/[0.03] to-transparent border-white/5 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-4 lg:p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                     <Library className="w-8 lg:w-12 h-8 lg:h-12 text-white" />
                 </div>
 
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-8">
-                    <div className="space-y-4 lg:space-y-6">
+                    <div className="space-y-4 lg:space-y-3">
                         <div className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-3">
                                 <Library className="w-4 h-4 text-foreground/40" />
@@ -181,7 +181,7 @@ export default function DashboardOverview({
 
                     <div className="divide-y divide-white/[0.02]">
                         {displayedSubs.map(sub => (
-                            <div key={sub.id} className="grid grid-cols-[1.5fr_1fr_0.8fr_1fr_0.5fr] px-6 py-4 items-center hover:bg-white/[0.01] transition-colors group">
+                            <div key={sub.id} className="grid grid-cols-[1.5fr_1fr_0.8fr_1fr_0.5fr] px-6 py-2 items-center hover:bg-white/[0.01] transition-colors group">
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center overflow-hidden shrink-0">
                                         <img src={sub.icon} alt={sub.name} className="w-6 h-6 object-contain" />

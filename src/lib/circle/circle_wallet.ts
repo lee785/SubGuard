@@ -23,9 +23,9 @@ export async function initializeUserWallet(userId: string) {
     console.log(`[Circle] Initializing wallet for user ${userId}...`);
 
     // Check if wallet already exists in our database
-    const existingWallet = getWalletByUserId(userId);
+    let existingWallet = getWalletByUserId(userId);
     if (existingWallet) {
-        console.log(`[Circle] Found existing wallet: ${existingWallet.address}`);
+        console.log(`[Circle] Found existing wallet in local DB: ${existingWallet.address}`);
         return {
             id: existingWallet.walletId,
             address: existingWallet.address,
@@ -35,13 +35,39 @@ export async function initializeUserWallet(userId: string) {
         };
     }
 
+    // NEW: Recovery Flow - Check Circle API directly if local DB is empty (common on Vercel redeploys)
+    try {
+        console.log(`[Circle] Local DB empty. Searching Circle for existing wallet with refId: ${userId}`);
+        const listResponse = await circleClient.listWallets({
+            walletSetId: WALLET_SET_ID,
+        });
+
+        const recoveredWallet = listResponse.data?.wallets?.find(w => w.refId === userId);
+
+        if (recoveredWallet) {
+            console.log(`[Circle] ♻️ Recovered existing wallet from Circle: ${recoveredWallet.address}`);
+            // Update local DB cache
+            saveUserWallet(userId, recoveredWallet.id!, recoveredWallet.address!, recoveredWallet.blockchain || 'ARC-TESTNET');
+
+            return {
+                id: recoveredWallet.id,
+                address: recoveredWallet.address,
+                userId: userId,
+                blockchain: recoveredWallet.blockchain || 'ARC-TESTNET',
+                isNew: false
+            };
+        }
+    } catch (err: any) {
+        console.warn(`[Circle] Recovery lookup failed (continuing to creation):`, err.message);
+    }
+
     try {
         // Create new wallet via Circle API on ARC-TESTNET
-        console.log(`[Circle] Creating new wallet on ARC-TESTNET via Circle SDK...`);
+        console.log(`[Circle] No existing wallet found. Creating new wallet on ARC-TESTNET...`);
 
         const response = await circleClient.createWallets({
             walletSetId: WALLET_SET_ID,
-            blockchains: ['ARC-TESTNET'],  // <-- FIXED: Changed from MATIC-AMOY to ARC-TESTNET
+            blockchains: ['ARC-TESTNET'],
             count: 1,
             metadata: [{ refId: userId }]
         });

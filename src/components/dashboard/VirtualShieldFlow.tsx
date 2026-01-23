@@ -75,14 +75,14 @@ export default function VirtualShieldFlow({ onComplete, onCancel, slotIndex, tot
         <div className="fixed inset-0 z-[60] flex items-center justify-center animate-in fade-in duration-300">
             <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={onCancel} />
 
-            <div className="relative w-full max-w-6xl h-[85vh] glass-card bg-[#030305] border-white/10 flex overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
+            <div className="relative w-full sm:max-w-6xl h-full sm:h-[85vh] glass-card bg-[#030305] border-white/10 flex flex-col lg:flex-row overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500 overflow-y-auto lg:overflow-hidden">
                 {/* Close Button */}
-                <button onClick={onCancel} className="absolute top-6 right-6 p-2 hover:bg-white/5 rounded-full transition-colors z-10">
+                <button onClick={onCancel} className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2 hover:bg-white/5 rounded-full transition-colors z-50 bg-black/50">
                     <X className="w-5 h-5 text-foreground/40" />
                 </button>
 
                 {/* Left Side: Configuration */}
-                <div className="flex-grow p-12 overflow-y-auto space-y-12 border-r border-white/5">
+                <div className="w-full lg:flex-grow p-6 sm:p-12 space-y-8 sm:space-y-12 border-b lg:border-b-0 lg:border-r border-white/5 order-2 lg:order-1">
                     <div className="space-y-2">
                         <h2 className="text-3xl font-bold tracking-tight text-white">Create Virtual Shield</h2>
                         <p className="text-foreground/40 text-xs">Configure a secure, isolated payment method for your subscription services.</p>
@@ -100,12 +100,12 @@ export default function VirtualShieldFlow({ onComplete, onCancel, slotIndex, tot
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/20 group-focus-within:text-primary transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Search merchants (e.g. Netflix, OpenAI)..."
+                                placeholder="Search (Netflix, OpenAI)..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-white/[0.02] border border-white/10 rounded-2xl px-12 py-5 text-sm focus:border-primary/50 transition-all outline-none pr-32"
+                                className="w-full bg-white/[0.02] border border-white/10 rounded-2xl px-12 py-4 sm:py-5 text-sm focus:border-primary/50 transition-all outline-none pr-28 sm:pr-32"
                             />
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                            <div className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 sm:gap-3">
                                 {currentMerchant && (
                                     <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center overflow-hidden border border-white/10 animate-in fade-in zoom-in-50 duration-300">
                                         <img src={currentMerchant.icon} alt={currentMerchant.name} className="w-5 h-5 object-contain" />
@@ -133,7 +133,7 @@ export default function VirtualShieldFlow({ onComplete, onCancel, slotIndex, tot
                             <h3 className="text-lg font-bold text-white tracking-tight">Spending Limits</h3>
                         </div>
 
-                        <div className="glass-card p-8 bg-white/[0.01] border-white/5 space-y-8">
+                        <div className="glass-card p-4 sm:p-8 bg-white/[0.01] border-white/5 space-y-6 sm:space-y-8">
                             <div className="flex items-center justify-between">
                                 <span className="text-[11px] font-black uppercase tracking-widest text-foreground/40">Cap Frequency</span>
                                 <div className="flex bg-black rounded-lg p-1 border border-white/5">
@@ -217,7 +217,7 @@ export default function VirtualShieldFlow({ onComplete, onCancel, slotIndex, tot
                             <h3 className="text-lg font-bold text-white tracking-tight">Guarding Policy</h3>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                             {[
                                 { id: 'strict', icon: Lock, label: 'Strict', desc: 'Hard decline on any charge over the limit.' },
                                 { id: 'adaptive', icon: Zap, label: 'AI-Adaptive', desc: 'Allows small variances based on history.' },
@@ -227,7 +227,7 @@ export default function VirtualShieldFlow({ onComplete, onCancel, slotIndex, tot
                                     key={p.id}
                                     onClick={() => setPolicy(p.id as any)}
                                     className={cn(
-                                        "glass-card p-6 flex flex-col items-start text-left gap-4 transition-all duration-300",
+                                        "glass-card p-4 sm:p-6 flex flex-row sm:flex-col items-center sm:items-start text-left gap-4 transition-all duration-300",
                                         policy === p.id
                                             ? "border-primary/50 bg-primary/[0.02]"
                                             : "border-white/5 bg-white/[0.01] hover:border-white/10"
@@ -258,9 +258,9 @@ export default function VirtualShieldFlow({ onComplete, onCancel, slotIndex, tot
                 </div>
 
                 {/* Right Side: Live Preview */}
-                <div className="w-[450px] p-12 bg-black/50 space-y-12">
+                <div className="w-full lg:w-[450px] p-8 sm:p-12 bg-black/50 space-y-8 sm:space-y-12 order-1 lg:order-2 lg:block shrink-0">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30">Live Preview</h3>
+                        <h3 className="text-[10px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30">Live Preview</h3>
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                             <span className="text-[9px] font-bold text-primary uppercase tracking-widest">Updating</span>

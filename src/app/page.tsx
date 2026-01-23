@@ -44,6 +44,7 @@ import WalletPopup from '@/components/dashboard/WalletPopup';
 import TierSelection from '@/components/dashboard/TierSelection';
 import VirtualShieldFlow from '@/components/dashboard/VirtualShieldFlow';
 import CardSuccess from '@/components/dashboard/CardSuccess';
+import SecurityProtocolModal from '@/components/dashboard/SecurityProtocolModal';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -81,6 +82,7 @@ export default function Home() {
     const [balance, setBalance] = useState<number>(0);
     const [activeTab, setActiveTab] = useState<'dashboard' | 'cards' | 'transactions' | 'subscriptions' | 'settings'>('dashboard');
     const [cardToView, setCardToView] = useState<any>(null);
+    const [isSecurityOpen, setIsSecurityOpen] = useState(false);
 
     // Persistence: Load active tab from localStorage
     useEffect(() => {
@@ -228,6 +230,9 @@ export default function Home() {
                         <span className="font-bold text-lg tracking-tighter">SUBGUARD</span>
                     </div>
                     <div className="flex items-center gap-3">
+                        <button onClick={() => setIsSecurityOpen(true)} className="p-2 text-foreground/40 hover:text-primary transition-colors">
+                            <Shield className="w-5 h-5" />
+                        </button>
                         <button
                             onClick={() => setIsNotifOpen(!isNotifOpen)}
                             className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-foreground/40 transition-colors relative"
@@ -344,10 +349,13 @@ export default function Home() {
                         </div>
 
                         <div className="flex items-center gap-6">
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/20">
+                            <button
+                                onClick={() => setIsSecurityOpen(true)}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/20 hover:bg-primary/10 transition-all cursor-pointer outline-none"
+                            >
                                 <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_#22c55e]" />
                                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Arc L1 Active</span>
-                            </div>
+                            </button>
                             <button
                                 onClick={() => setIsNotifOpen(!isNotifOpen)}
                                 className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-foreground/40 transition-colors relative"
@@ -479,6 +487,10 @@ export default function Home() {
                         </div>
                     </div>
                 )}
+                <SecurityProtocolModal
+                    isOpen={isSecurityOpen}
+                    onClose={() => setIsSecurityOpen(false)}
+                />
             </div>
         );
     }
@@ -494,7 +506,7 @@ export default function Home() {
                         <span className="font-bold text-xl tracking-tighter">SUBGUARD</span>
                     </div>
                     <div className="hidden md:flex items-center gap-8">
-                        <NavLink href="#">SECURITY</NavLink>
+                        <button onClick={() => setIsSecurityOpen(true)} className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/40 hover:text-white transition-colors">SECURITY</button>
                         <a href="https://testnet.arcscan.app/" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/40 hover:text-white transition-colors">
                             Arc Testnet
                         </a>
@@ -502,7 +514,10 @@ export default function Home() {
                             Docs <span className="text-[10px] bg-white/5 px-1 py-0.5 rounded opacity-50">Soon</span>
                         </span>
                     </div>
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-4 md:gap-6">
+                        <button onClick={() => setIsSecurityOpen(true)} className="md:hidden p-2 text-foreground/40 hover:text-primary transition-colors">
+                            <Shield className="w-5 h-5" />
+                        </button>
                         <button onClick={login} className="text-xs font-bold uppercase tracking-widest text-foreground/40 hover:text-white transition-colors">LOGIN</button>
                         <button onClick={login} className="btn-primary text-[10px] tracking-[0.2em] px-6 py-2.5">SIGN UP</button>
                     </div>
@@ -510,7 +525,7 @@ export default function Home() {
             </nav>
 
             {/* Hero Section */}
-            <section className="pt-11 pb-8 px-6">
+            <section className="pt-28 md:pt-16 pb-0 px-6">
                 <div className="max-w-[1050px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div className="space-y-8 animate-in fade-in slide-in-from-left duration-1000 md:-ml-12">
                         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 w-fit">
@@ -645,7 +660,7 @@ export default function Home() {
             </section>
 
             {/* Partner Ticker */}
-            <div className="border-y border-white/10 bg-white/[0.01] py-7 overflow-hidden">
+            <div className="border-y border-white/10 bg-white/[0.01] pt-4 pb-10 overflow-hidden">
                 <div className="w-full px-6 flex items-center gap-20">
                     <div className="flex items-center gap-12 shrink-0 ml-4 md:ml-12 lg:ml-20">
                         <span className="text-[11px] font-black tracking-[0.7em] text-foreground/30 uppercase whitespace-nowrap">POWERED BY</span>
@@ -659,7 +674,7 @@ export default function Home() {
 
                         <div className="flex gap-40 w-max partner-ticker-animation items-center py-4">
                             {[...Array(2)].map((_, i) => (
-                                <div key={i} className="flex items-center gap-40 brightness-[1.1]">
+                                <div key={i} className="flex items-center gap-40 brightness-[1.8] contrast-[1.2]">
                                     <img src="/icons/Stripe.png" alt="Stripe" className="h-10 w-auto object-contain" />
                                     <img src="/icons/Circle.png" alt="Circle" className="h-11 w-auto object-contain contrast-110 saturate-125" />
                                     <img src="/icons/Privy.png" alt="Privy" className="h-9 w-auto object-contain [filter:brightness(0)_invert(1)]" />
@@ -671,6 +686,8 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+
+            <div className="py-12 md:py-20" />
 
             {/* Advanced Mitigation */}
             <section className="section-container">
@@ -695,7 +712,14 @@ export default function Home() {
                         description="High-frequency settlement on the Arc L1 blockchain for fully compliant USDC treasury management."
                     />
                 </div>
+                <div className="mt-8 flex justify-center">
+                    <button onClick={() => setIsSecurityOpen(true)} className="btn-secondary px-8 py-3 text-[10px] uppercase tracking-widest flex items-center gap-2">
+                        Review Security Protocol <ChevronRight className="w-4 h-4 text-primary" />
+                    </button>
+                </div>
             </section>
+
+            <div className="py-10 md:py-16" />
 
             {/* Full-Stack Visibility */}
             <section className="section-container grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
@@ -782,39 +806,39 @@ export default function Home() {
                     </div>
 
                     <div className="md:col-span-2 md:col-start-5">
-                        <h4 className="font-bold mb-6 text-sm tracking-widest text-foreground/30 uppercase">PRODUCT'S</h4>
+                        <h4 className="font-bold mb-6 text-sm tracking-widest text-foreground/30 uppercase">PRODUCTS</h4>
                         <div className="space-y-4 text-sm font-bold opacity-60">
-                            <p className="hover:text-primary cursor-pointer transition-colors">Subscription Tracker</p>
-                            <p className="hover:text-primary cursor-pointer transition-colors">Shield Cards (virtual)</p>
-                            <p className="hover:text-primary cursor-pointer transition-colors">AI Transaction Guard</p>
+                            <p className="hover:text-primary cursor-pointer transition-colors whitespace-nowrap">Subscription Tracker</p>
+                            <p className="hover:text-primary cursor-pointer transition-colors whitespace-nowrap">Shield Cards (virtual)</p>
+                            <p className="hover:text-primary cursor-pointer transition-colors whitespace-nowrap">AI Transaction Guard</p>
                         </div>
                     </div>
 
                     <div className="md:col-span-2">
                         <h4 className="font-bold mb-6 text-sm tracking-widest text-foreground/30 uppercase">ASSETS</h4>
                         <div className="space-y-4 text-sm font-bold opacity-60">
-                            <p className="hover:text-primary cursor-pointer transition-colors">USDC on Arc</p>
-                            <p className="hover:text-primary cursor-pointer transition-colors">Unified balances</p>
-                            <p className="hover:text-primary cursor-pointer transition-colors">More assets soon</p>
+                            <p className="hover:text-primary cursor-pointer transition-colors whitespace-nowrap">USDC on Arc</p>
+                            <p className="hover:text-primary cursor-pointer transition-colors whitespace-nowrap">Unified balances</p>
+                            <p className="hover:text-primary cursor-pointer transition-colors whitespace-nowrap">More assets soon</p>
                         </div>
                     </div>
 
                     <div className="md:col-span-2">
                         <h4 className="font-bold mb-6 text-sm tracking-widest text-foreground/30 uppercase">NETWORK</h4>
                         <div className="space-y-4 text-sm font-bold opacity-60">
-                            <p className="hover:text-primary cursor-pointer transition-colors">Arc Testnet</p>
-                            <p className="hover:text-primary cursor-pointer transition-colors">More chains soon</p>
+                            <p className="hover:text-primary cursor-pointer transition-colors whitespace-nowrap">Arc Testnet</p>
+                            <p className="hover:text-primary cursor-pointer transition-colors whitespace-nowrap">More chains soon</p>
                         </div>
                     </div>
 
                     <div className="md:col-span-2 md:-mr-16">
                         <h4 className="font-bold mb-6 text-sm tracking-widest text-foreground/30 uppercase">DOCUMENTATION</h4>
                         <div className="space-y-4 text-sm font-bold opacity-60">
-                            <p className="hover:text-primary cursor-not-allowed transition-colors flex items-center gap-1">
+                            <p className="hover:text-primary cursor-not-allowed transition-colors flex items-center gap-1 whitespace-nowrap">
                                 Subguard <span className="text-[10px] bg-white/5 px-1 py-0.5 rounded opacity-50">Soon</span>
                             </p>
-                            <a href="https://developers.circle.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary cursor-pointer transition-colors block">Circle</a>
-                            <a href="https://docs.arc.network/arc/concepts/welcome-to-arc" target="_blank" rel="noopener noreferrer" className="hover:text-primary cursor-pointer transition-colors block">Arc</a>
+                            <a href="https://developers.circle.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary cursor-pointer transition-colors block whitespace-nowrap">Circle</a>
+                            <a href="https://docs.arc.network/arc/concepts/welcome-to-arc" target="_blank" rel="noopener noreferrer" className="hover:text-primary cursor-pointer transition-colors block whitespace-nowrap">Arc</a>
                         </div>
                     </div>
                 </div>
@@ -842,6 +866,10 @@ export default function Home() {
                         </a>
                     </div>
                 </div>
+                <SecurityProtocolModal
+                    isOpen={isSecurityOpen}
+                    onClose={() => setIsSecurityOpen(false)}
+                />
             </footer>
         </div>
     );

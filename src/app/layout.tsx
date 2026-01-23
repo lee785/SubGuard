@@ -8,6 +8,10 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
     title: "SubGuard | The Agentic Subscription Guard",
     description: "Autonomous USDC treasury management on Arc L1.",
+    icons: {
+        icon: "/icons/SubGuard.png",
+        apple: "/icons/SubGuard.png",
+    }
 };
 
 export default function RootLayout({

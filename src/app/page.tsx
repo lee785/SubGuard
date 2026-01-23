@@ -522,11 +522,11 @@ export default function Home() {
                         <p className="text-base text-foreground/50 max-w-lg leading-relaxed">
                             Protect your assets from unwanted recurring charges. The first AI-powerd subscription gatekeeper built on Arc L1 architecture.
                         </p>
-                        <div className="flex flex-wrap gap-4">
-                            <button onClick={login} className="btn-primary px-10 py-4 uppercase">Secure Your Assets</button>
-                            <button className="btn-secondary px-10 py-4 uppercase opacity-50 cursor-not-allowed flex items-center gap-2" disabled>
+                        <div className="flex flex-row items-center gap-4">
+                            <button onClick={login} className="btn-primary px-7 py-3 uppercase text-[10px]">Secure Your Assets</button>
+                            <button className="btn-secondary px-7 py-3 uppercase opacity-50 cursor-not-allowed flex items-center gap-2 text-[10px]" disabled>
                                 View Documentation
-                                <span className="text-[8px] bg-primary text-black px-1.5 py-0.5 rounded font-black tracking-widest">SOON</span>
+                                <span className="text-[7px] bg-primary text-black px-1.5 py-0.5 rounded font-black tracking-widest shrink-0">SOON</span>
                             </button>
                         </div>
 

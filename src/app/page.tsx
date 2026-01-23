@@ -65,6 +65,7 @@ const MOCK_TRANSACTIONS = [
 
 export default function Home() {
     const { login, authenticated, user, logout, ready, getAccessToken } = usePrivy();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [isAgentActive, setIsAgentActive] = useState(true);
     const [isWalletOpen, setIsWalletOpen] = useState(false);
     const [isFlowOpen, setIsFlowOpen] = useState(false);
@@ -162,6 +163,16 @@ export default function Home() {
         }
     };
 
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            await logout();
+        } catch (err) {
+            console.error('Logout failed:', err);
+            setIsLoggingOut(false);
+        }
+    };
+
     const toggleSub = (id: number) => {
         setSubs(prev => prev.map(s => {
             if (s.id === id) {
@@ -194,10 +205,13 @@ export default function Home() {
 
     /**
      * OPTIMIZATION: Instant Render Logic
-     * We only switch to the Authenticated Dashboard if Privy is ready AND authenticated.
-     * Otherwise, we render the Landing Page shell immediately.
+     * We show the LoadingOverlay if Privy is not ready, auth is being checked, or we are logging out.
      */
-    if (ready && authenticated) {
+    if (!ready || isLoggingOut) {
+        return <LoadingOverlay />;
+    }
+
+    if (authenticated) {
         return (
             <div className="min-h-screen bg-[#030305] text-foreground animate-in fade-in duration-500 flex flex-col md:flex-row">
                 {/* Mobile Header with Hamburger */}
@@ -302,7 +316,7 @@ export default function Home() {
 
                                 {/* Mobile Sign Out Button */}
                                 <button
-                                    onClick={() => logout()}
+                                    onClick={handleLogout}
                                     className="w-full flex items-center justify-between group p-2 rounded-xl border border-white/5 bg-white/5 lg:hidden"
                                 >
                                     <span className="text-xs font-bold text-foreground/60 group-hover:text-red-500 transition-colors">Sign Out</span>
@@ -341,7 +355,7 @@ export default function Home() {
                                 <span className="text-[10px] font-black text-white/60 tracking-widest uppercase">SubGuard Admin</span>
                             </button>
                             <button
-                                onClick={() => logout()}
+                                onClick={handleLogout}
                                 className="p-2.5 rounded-xl bg-red-500/5 border border-red-500/10 hover:bg-red-500/10 text-red-500/60 transition-colors"
                                 title="Sign Out"
                             >
@@ -465,7 +479,7 @@ export default function Home() {
         <div className="min-h-screen flex flex-col pt-0 bg-[#030305]">
             {/* Navigation */}
             <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#030305]/80 backdrop-blur-md">
-                <div className="max-w-[1100px] mx-auto px-6 h-14 flex items-center justify-between">
+                <div className="max-w-[1400px] mx-auto px-10 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <img src="/icons/SubGuard.png" alt="SubGuard" className="w-10 h-10 object-contain" />
                         <span className="font-bold text-xl tracking-tighter">SUBGUARD</span>
@@ -921,6 +935,38 @@ function Step({ children }: { children: React.ReactNode }) {
                 <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
             </div>
             {children}
+        </div>
+    );
+}
+
+function LoadingOverlay() {
+    return (
+        <div className="fixed inset-0 z-[9999] bg-[#030305] flex items-center justify-center animate-in fade-in duration-500">
+            <div className="relative flex flex-col items-center gap-8">
+                {/* Glowing Aura */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary/20 rounded-full blur-[60px] animate-pulse" />
+
+                {/* Logo Container */}
+                <div className="relative w-24 h-24 flex items-center justify-center">
+                    <img
+                        src="/icons/SubGuard.png"
+                        alt="SubGuard"
+                        className="w-20 h-20 object-contain animate-pulse relative z-10"
+                    />
+
+                    {/* Ring Path Animation (Visual flair) */}
+                    <div className="absolute inset-0 border-2 border-primary/10 rounded-full animate-spin-slow" />
+                </div>
+
+                <div className="flex flex-col items-center gap-2">
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] animate-pulse">
+                        Synchronizing
+                    </span>
+                    <span className="text-[8px] font-bold text-foreground/20 uppercase tracking-[0.3em]">
+                        Arc L1 Security Layer
+                    </span>
+                </div>
+            </div>
         </div>
     );
 }

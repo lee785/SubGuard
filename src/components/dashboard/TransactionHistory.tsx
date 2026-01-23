@@ -38,12 +38,12 @@ export default function TransactionHistory({ transactions }: { transactions: Tra
                             <td className="p-6">
                                 {tx.status === 'Approved' ? (
                                     <a
-                                        href={`https://arcscan.io/tx/${tx.hash || '0x' + Math.random().toString(16).slice(2, 12)}`}
+                                        href={`https://testnet.arcscan.app/tx/${tx.hash}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-[10px] font-mono text-primary/40 hover:text-primary transition-colors hover:underline uppercase"
                                     >
-                                        {tx.hash || '0x' + Math.random().toString(16).slice(2, 10) + '...'}
+                                        {tx.hash ? `${tx.hash.slice(0, 6)}...${tx.hash.slice(-4)}` : 'View'}
                                     </a>
                                 ) : (
                                     <span className="text-[10px] font-mono text-foreground/10">—</span>

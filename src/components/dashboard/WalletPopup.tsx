@@ -18,7 +18,25 @@ function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export default function WalletPopup({ isOpen, onClose, address, userId, balance = 0 }: { isOpen: boolean; onClose: () => void; address: string; userId?: string; balance?: number }) {
+export default function WalletPopup({
+    isOpen,
+    onClose,
+    address,
+    userId,
+    balance = 0,
+    setBalance,
+    addTransaction,
+    setArcConfirm
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    address: string;
+    userId?: string;
+    balance?: number;
+    setBalance: (bal: number) => void;
+    addTransaction: (tx: any) => void;
+    setArcConfirm: (data: any) => void;
+}) {
     const [view, setView] = useState<'main' | 'send' | 'receive'>('main');
     const [copied, setCopied] = useState(false);
     const [sendAmount, setSendAmount] = useState('');
@@ -57,40 +75,59 @@ export default function WalletPopup({ isOpen, onClose, address, userId, balance 
     const handleConfirm = async () => {
         if (!sendAmount || !recipientAddress) return;
 
-        setIsSending(true);
-        setTxResult(null);
+        setArcConfirm({
+            isOpen: true,
+            type: 'transfer',
+            details: {
+                amount: sendAmount,
+                to: recipientAddress,
+                fee: '0.00 USDC'
+            },
+            onConfirm: async () => {
+                setIsSending(true);
+                setTxResult(null);
 
-        try {
-            const response = await fetch('/api/wallet/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: userId,
-                    toAddress: recipientAddress,
-                    amount: sendAmount
-                })
-            });
+                try {
+                    const response = await fetch('/api/wallet/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: userId,
+                            toAddress: recipientAddress,
+                            amount: sendAmount
+                        })
+                    });
 
-            const data = await response.json();
+                    const data = await response.json();
 
-            if (data.success) {
-                setTxResult({ success: true, message: `Transaction ${data.transactionId} submitted!` });
-                setTimeout(() => {
+                    if (data.success) {
+                        // Immediate Local State Update
+                        setBalance(currentBalance - parseFloat(sendAmount));
+                        addTransaction({
+                            merchant: 'USDC Settlement',
+                            amount: sendAmount,
+                            status: 'Approved'
+                        });
+
+                        setTxResult({ success: true, message: `Settlement complete!` });
+
+                        // Reset WalletPopup state
+                        setIsSending(false);
+                        setView('main');
+                        setSendAmount('');
+                        setRecipientAddress('');
+                    } else {
+                        setTxResult({ success: false, message: data.error || 'Transaction failed' });
+                        setIsSending(false);
+                        throw new Error(data.error || 'Transaction failed');
+                    }
+                } catch (error: any) {
+                    setTxResult({ success: false, message: error.message });
                     setIsSending(false);
-                    onClose();
-                    setView('main');
-                    setSendAmount('');
-                    setRecipientAddress('');
-                    setTxResult(null);
-                }, 2000);
-            } else {
-                setTxResult({ success: false, message: data.error || 'Transaction failed' });
-                setIsSending(false);
+                    throw error;
+                }
             }
-        } catch (error: any) {
-            setTxResult({ success: false, message: error.message });
-            setIsSending(false);
-        }
+        });
     };
 
     return (

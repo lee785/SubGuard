@@ -56,6 +56,11 @@ interface CardsManagerProps {
     userCards: any[];
     initialSelectedCard?: any;
     onCloseDetails?: () => void;
+    balance: number;
+    addTransaction: (tx: any) => void;
+    setBalance: (bal: number) => void;
+    setCurrentTier: (tierId: 'free' | 'tier1' | 'tier2') => void;
+    setArcConfirm: (data: any) => void;
 }
 
 export default function CardsManager({
@@ -65,7 +70,12 @@ export default function CardsManager({
     currentTier,
     userCards,
     initialSelectedCard,
-    onCloseDetails
+    onCloseDetails,
+    balance,
+    addTransaction,
+    setBalance,
+    setCurrentTier,
+    setArcConfirm
 }: CardsManagerProps) {
     const [selectedCardForDetails, setSelectedCardForDetails] = useState<any>(null);
     const [selectedCardForSettings, setSelectedCardForSettings] = useState<any>(null);
@@ -106,65 +116,78 @@ export default function CardsManager({
         onUpdateCard(updated);
     };
 
+    const totalSpent = cardsToDisplay.reduce((sum, card) => sum + (card.spent || 0), 0);
+    const limitRemaining = (currentTier as any).maxLimit - totalSpent;
+
+    const handleUpgradeInteraction = (tierId: 'tier1' | 'tier2') => {
+        const targetTierName = tierId === 'tier1' ? 'Tier 2' : 'Tier 3';
+        const cost = tierId === 'tier1' ? '75.00' : '150.00';
+
+        if (balance < parseFloat(cost)) {
+            alert('Insufficient USDC balance for this upgrade.');
+            return;
+        }
+
+        setArcConfirm({
+            isOpen: true,
+            type: 'upgrade',
+            details: {
+                tier: targetTierName,
+                amount: cost,
+                fee: '0.00 USDC'
+            },
+            onConfirm: async () => {
+                // Actual state update
+                setBalance(balance - parseFloat(cost));
+                setCurrentTier(tierId);
+                addTransaction({
+                    merchant: `Upgrade to ${targetTierName}`,
+                    amount: cost,
+                    status: 'Approved'
+                });
+            }
+        });
+    };
+
     return (
         <div className="space-y-6 lg:space-y-10 animate-in fade-in duration-700">
             {/* Tier Stats Bar */}
-            <div className="glass-card p-3.5 lg:p-4 bg-white/[0.01] border-white/5 relative overflow-hidden group">
-                {/* Background flare */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary/5 blur-[50px] rounded-full pointer-events-none" />
+            <div className="flex flex-col items-center gap-4 lg:gap-6 p-4 lg:p-6 glass-card border-white/5 bg-white/[0.01]">
+                <div className="flex items-center justify-center lg:justify-start gap-4 lg:gap-5 w-full">
+                    <div className="w-12 lg:w-12 h-12 lg:h-12 rounded-xl lg:rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                        <Library className="w-5 lg:w-6 h-5 lg:h-6 text-primary" />
+                    </div>
+                    <div className="space-y-0.5 flex-grow-0 lg:flex-grow text-center lg:text-left">
+                        <p className="text-[9px] font-black tracking-[0.2em] text-foreground/20 uppercase">Current Subscription</p>
+                        <div className="flex items-center justify-center lg:justify-start gap-2">
+                            <h3 className="text-base font-bold text-white">{currentTier.name}</h3>
+                            <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-primary text-black uppercase tracking-widest">Active</span>
+                        </div>
+                    </div>
+                </div>
 
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-0 relative z-10">
-
-                    {/* Left: Card Usage (Desktop) */}
-                    <div className="hidden lg:flex flex-col items-start flex-1">
-                        <p className="text-[8px] font-black tracking-[0.15em] text-foreground/20 uppercase mb-0.5">Card Usage</p>
-                        <p className="text-sm font-bold text-white">
+                <div className="flex items-center justify-between w-full gap-6 py-3 lg:py-0 border-y lg:border-0 border-white/5">
+                    <div className="space-y-0.5 text-center flex-1">
+                        <p className="text-[9px] font-black tracking-[0.15em] text-foreground/20 uppercase">Card Usage</p>
+                        <p className="text-base font-bold text-white">
                             {userCards.length} <span className="text-foreground/20">/</span> {currentTier.maxCards}
                         </p>
                     </div>
-
-                    {/* Center: Primary Tier Info */}
-                    <div className="flex flex-col items-center gap-2 flex-1">
-                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center border border-primary/20 shrink-0 group-hover:scale-105 transition-transform">
-                            <Library className="w-5 h-5 text-primary" />
-                        </div>
-                        <div className="text-center">
-                            <h3 className="text-[13px] font-bold text-white leading-none uppercase tracking-tight">{currentTier.name}</h3>
-                            <div className="flex items-center justify-center gap-1.5 mt-1.5">
-                                <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
-                                <span className="text-[8px] font-black text-primary uppercase tracking-[0.2em]">Guard Active</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right: Limit Remaining (Desktop) */}
-                    <div className="hidden lg:flex flex-col items-end flex-1">
-                        <p className="text-[8px] font-black tracking-[0.15em] text-foreground/20 uppercase mb-0.5">Limit Remaining</p>
-                        <p className="text-sm font-bold text-primary">$320.00</p>
-                    </div>
-
-                    {/* Mobile Stats Toggle/Row */}
-                    <div className="lg:hidden flex items-center justify-around w-full py-2 border-t border-white/5 mt-2">
-                        <div className="text-center">
-                            <p className="text-[8px] font-black tracking-[0.15em] text-foreground/20 uppercase">Usage</p>
-                            <p className="text-xs font-bold text-white">{userCards.length} / {currentTier.maxCards}</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-[8px] font-black tracking-[0.15em] text-foreground/20 uppercase">Remaining</p>
-                            <p className="text-xs font-bold text-primary">$320.00</p>
-                        </div>
+                    <div className="w-px h-8 bg-white/10" />
+                    <div className="space-y-0.5 text-center flex-1">
+                        <p className="text-[9px] font-black tracking-[0.15em] text-foreground/20 uppercase">Limit Remaining</p>
+                        <p className="text-base font-bold text-primary">${limitRemaining.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                 </div>
 
-                {/* Sub-action */}
-                <div className="mt-3 lg:mt-4 pt-3 border-t border-white/5 flex justify-center">
-                    <button
-                        onClick={onUpgrade}
-                        className="text-[8px] font-black uppercase tracking-[0.2em] text-foreground/20 hover:text-primary transition-colors flex items-center gap-2 group/btn"
-                    >
-                        Request Capacity Upgrade <ArrowUpRight className="w-2.5 h-2.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-                    </button>
-                </div>
+                <button
+                    onClick={() => handleUpgradeInteraction(currentTier.id === 'free' ? 'tier1' : 'tier2')}
+                    disabled={currentTier.id === 'tier2'}
+                    className="w-full lg:w-auto px-6 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                    {currentTier.id === 'tier2' ? 'Max Tier reached' : 'Upgrade Tier'}
+                    <ArrowUpRight className="w-3 h-3" />
+                </button>
             </div>
 
             {/* Content Header */}

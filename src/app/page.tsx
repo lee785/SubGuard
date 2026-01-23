@@ -45,6 +45,13 @@ import TierSelection from '@/components/dashboard/TierSelection';
 import VirtualShieldFlow from '@/components/dashboard/VirtualShieldFlow';
 import CardSuccess from '@/components/dashboard/CardSuccess';
 import SecurityProtocolModal from '@/components/dashboard/SecurityProtocolModal';
+import ArcChainConfirm from '@/components/dashboard/ArcChainConfirm';
+
+const TIERS = {
+    free: { id: 'free', name: 'Tier 1', maxCards: 1, maxLimit: 500 },
+    tier1: { id: 'tier1', name: 'Tier 2', maxCards: 3, maxLimit: 1250 },
+    tier2: { id: 'tier2', name: 'Tier 3', maxCards: 5, maxLimit: 2500 },
+} as const;
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -59,9 +66,9 @@ const MOCK_SUBSCRIPTIONS = [
 ];
 
 const MOCK_TRANSACTIONS = [
-    { id: 1, merchant: 'Netflix', status: 'Approved', amount: '15.99', time: '2h ago', method: 'Arc Testnet' },
-    { id: 2, merchant: 'OpenAI', status: 'Blocked', amount: '124.20', time: '5h ago', method: 'Arc Testnet' },
-    { id: 3, merchant: 'YouTube', status: 'Approved', amount: '28.00', time: '1d ago', method: 'Arc Testnet' },
+    { id: 1, merchant: 'Netflix', status: 'Approved', amount: '15.99', time: '2h ago', method: 'Arc Testnet', hash: '0x1a2b...3c4d' },
+    { id: 2, merchant: 'OpenAI', status: 'Blocked', amount: '124.20', time: '5h ago', method: 'Arc Testnet', hash: '0x5e6f...7g8h' },
+    { id: 3, merchant: 'YouTube', status: 'Approved', amount: '28.00', time: '1d ago', method: 'Arc Testnet', hash: '0x9i0j...1k2l' },
 ];
 
 export default function Home() {
@@ -75,6 +82,8 @@ export default function Home() {
     const [userCards, setUserCards] = useState<any[]>([]);
     const [cardSuccess, setCardSuccess] = useState<any>(null);
     const [subs, setSubs] = useState(MOCK_SUBSCRIPTIONS);
+    const [transactions, setTransactions] = useState(MOCK_TRANSACTIONS);
+    const [hasRealTx, setHasRealTx] = useState(false);
     const [notifications, setNotifications] = useState<any[]>([]);
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -83,6 +92,17 @@ export default function Home() {
     const [activeTab, setActiveTab] = useState<'dashboard' | 'cards' | 'transactions' | 'subscriptions' | 'settings'>('dashboard');
     const [cardToView, setCardToView] = useState<any>(null);
     const [isSecurityOpen, setIsSecurityOpen] = useState(false);
+    const [arcConfirm, setArcConfirm] = useState<{
+        isOpen: boolean;
+        type: 'transfer' | 'upgrade' | 'generation';
+        details: any;
+        onConfirm: () => Promise<void>;
+    }>({
+        isOpen: false,
+        type: 'transfer',
+        details: {},
+        onConfirm: async () => { }
+    });
 
     // Persistence: Load active tab from localStorage
     useEffect(() => {
@@ -130,6 +150,25 @@ export default function Home() {
             }
         } catch (err) {
             console.error('Failed to fetch Circle wallet:', err);
+        }
+    };
+
+    const addTransaction = (tx: any) => {
+        const fullHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        const newTx = {
+            id: Date.now(),
+            status: 'Approved',
+            time: 'Just now',
+            method: 'Arc Testnet',
+            hash: fullHash,
+            ...tx
+        };
+
+        if (!hasRealTx) {
+            setTransactions([newTx]);
+            setHasRealTx(true);
+        } else {
+            setTransactions(prev => [newTx, ...prev]);
         }
     };
 
@@ -404,10 +443,15 @@ export default function Home() {
                                             onUpdateCard={handleUpdateCard}
                                             initialSelectedCard={cardToView}
                                             onCloseDetails={() => setCardToView(null)}
+                                            balance={balance}
+                                            addTransaction={addTransaction}
+                                            setBalance={setBalance}
+                                            setCurrentTier={(tierId: 'free' | 'tier1' | 'tier2') => setCurrentTier(TIERS[tierId])}
+                                            setArcConfirm={setArcConfirm}
                                         />
                                     )
                                 )}
-                                {activeTab === 'transactions' && <TransactionHistory transactions={MOCK_TRANSACTIONS} />}
+                                {activeTab === 'transactions' && <TransactionHistory transactions={transactions} />}
                                 {activeTab === 'settings' && <SettingsView />}
                             </div>
                         </main>
@@ -427,6 +471,9 @@ export default function Home() {
                     address={circleWallet?.address || '0x...'}
                     userId={user?.id}
                     balance={balance}
+                    setBalance={setBalance}
+                    addTransaction={addTransaction}
+                    setArcConfirm={setArcConfirm}
                 />
 
                 {isFlowOpen && (
@@ -490,6 +537,14 @@ export default function Home() {
                 <SecurityProtocolModal
                     isOpen={isSecurityOpen}
                     onClose={() => setIsSecurityOpen(false)}
+                />
+
+                <ArcChainConfirm
+                    isOpen={arcConfirm.isOpen}
+                    onClose={() => setArcConfirm(prev => ({ ...prev, isOpen: false }))}
+                    onConfirm={arcConfirm.onConfirm}
+                    type={arcConfirm.type}
+                    details={arcConfirm.details}
                 />
             </div>
         );

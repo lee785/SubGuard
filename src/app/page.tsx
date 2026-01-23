@@ -553,18 +553,19 @@ export default function Home() {
                         <div className="relative w-full h-full">
                             {/* Netflix Card */}
                             <div className="absolute top-[35%] left-[0%] z-20 animate-float shadow-2xl scale-[0.75]">
-                                <div className="glass-card bg-[#0a0a0c]/90 border-white/10 p-4 w-64">
+                                <div className="glass-card bg-[#0a0a0c]/90 border-white/10 p-4 w-64 relative">
+                                    {/* Safe Indicator */}
+                                    <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_12px_#22c55e]" />
+                                        <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Safe</span>
+                                    </div>
                                     <div className="flex items-center gap-4">
                                         <div className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 overflow-hidden shrink-0">
                                             <img src="/icons/Netflix.png" alt="Netflix" className="w-10 h-10 object-contain" />
                                         </div>
                                         <div className="flex-grow min-w-0">
-                                            <div className="flex items-center gap-3 mb-1.5">
-                                                <p className="font-bold text-sm tracking-tight whitespace-nowrap">NETFLIX STANDARD</p>
-                                                <div className="flex items-center gap-1.5 shrink-0">
-                                                    <div className="w-1 h-1 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]" />
-                                                    <span className="text-[7px] font-black text-primary uppercase tracking-widest">Safe</span>
-                                                </div>
+                                            <div className="mb-1.5">
+                                                <p className="font-bold text-sm tracking-tight whitespace-nowrap text-white">NETFLIX STANDARD</p>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <span className="text-[10px] text-foreground/40 font-bold uppercase tracking-widest">Frequency</span>

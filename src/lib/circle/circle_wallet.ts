@@ -84,18 +84,25 @@ export async function getWalletBalance(walletId: string) {
         });
 
         const balances = response.data?.tokenBalances || [];
-        const usdcBalance = balances.find((b: any) => b.token?.symbol === 'USDC');
+        console.log(`[Circle] Raw balances for ${walletId}:`, JSON.stringify(balances));
 
-        console.log(`[Circle] Balance: ${usdcBalance?.amount || '0'} USDC`);
+        // Try to find USDC by symbol (handling potential variations)
+        const usdcBalance = balances.find((b: any) =>
+            b.token?.symbol === 'USDC' ||
+            b.token?.name?.includes('USDC') ||
+            b.token?.symbol?.includes('USDC')
+        );
+
+        const amount = usdcBalance?.amount || '0';
+        console.log(`[Circle] Detected USDC Balance: ${amount}`);
 
         return {
-            balance: usdcBalance?.amount || '0',
+            balance: amount,
             currency: 'USDC',
             raw: balances
         };
     } catch (error: any) {
         console.error(`[Circle] Failed to fetch balance:`, error.message);
-        // Re-throw - NO MORE MOCK FALLBACK
         throw error;
     }
 }

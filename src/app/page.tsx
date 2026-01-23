@@ -165,8 +165,15 @@ export default function Home() {
 
     const handleLogout = async () => {
         setIsLoggingOut(true);
+        // Ensure the loading screen stays for at least 3 seconds as requested
+        const startTime = Date.now();
         try {
             await logout();
+            const elapsed = Date.now() - startTime;
+            const remaining = Math.max(0, 3000 - elapsed);
+            setTimeout(() => {
+                setIsLoggingOut(false);
+            }, remaining);
         } catch (err) {
             console.error('Logout failed:', err);
             setIsLoggingOut(false);
@@ -367,7 +374,7 @@ export default function Home() {
                     <div className="flex-grow flex overflow-hidden">
                         {/* Content Area */}
                         <main className="flex-grow p-4 md:p-6 lg:p-8 overflow-y-auto overflow-x-hidden">
-                            {activeTab === 'dashboard' && <DashboardOverview onOpenWallet={() => setIsWalletOpen(true)} balance={balance} />}
+                            {activeTab === 'dashboard' && <DashboardOverview onOpenWallet={() => setIsWalletOpen(true)} balance={balance} onRefresh={fetchCircleWallet} />}
                             {activeTab === 'subscriptions' && <SubscriptionList subs={subs} toggleSub={toggleSub} onUnsubscribe={handleUnsubscribe} />}
                             {activeTab === 'cards' && (
                                 showTierSelection ? (

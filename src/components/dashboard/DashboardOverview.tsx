@@ -7,7 +7,8 @@ import {
     BarChart3,
     MoreHorizontal,
     TrendingUp,
-    Library
+    Library,
+    RotateCcw
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -62,11 +63,14 @@ const DASHBOARD_SUBS = [
 
 export default function DashboardOverview({
     onOpenWallet,
-    balance = 0
+    balance = 0,
+    onRefresh
 }: {
     onOpenWallet?: () => void;
     balance?: number;
+    onRefresh?: () => void;
 }) {
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [showAll, setShowAll] = useState(false);
     const [mockSubs, setMockSubs] = useState(DASHBOARD_SUBS);
 
@@ -87,9 +91,27 @@ export default function DashboardOverview({
 
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-8">
                     <div className="space-y-4 lg:space-y-6">
-                        <div className="flex items-center gap-3">
-                            <Library className="w-4 h-4 text-foreground/40" />
-                            <h3 className="text-[10px] font-black tracking-[0.3em] text-foreground/40 uppercase">Treasury Balance</h3>
+                        <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                                <Library className="w-4 h-4 text-foreground/40" />
+                                <h3 className="text-[10px] font-black tracking-[0.3em] text-foreground/40 uppercase">Treasury Balance</h3>
+                            </div>
+                            <button
+                                onClick={async () => {
+                                    if (onRefresh) {
+                                        setIsRefreshing(true);
+                                        await onRefresh();
+                                        setTimeout(() => setIsRefreshing(false), 1000);
+                                    }
+                                }}
+                                className={cn(
+                                    "p-1.5 rounded-lg hover:bg-white/5 text-foreground/20 transition-all",
+                                    isRefreshing && "animate-spin text-primary"
+                                )}
+                                title="Refresh Balance"
+                            >
+                                <RotateCcw className="w-3.5 h-3.5" />
+                            </button>
                         </div>
                         <div className="space-y-1">
                             <div className="flex items-baseline gap-2 sm:gap-4">
